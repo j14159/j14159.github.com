@@ -30,7 +30,7 @@ And I have a few goals specific to Clojure and Erlang:
 * learn to use their build tools (Leiningen and Rebar)
 * loosen my reliance on object orientation
 * get more comfortable with dynamic typing (I tend to yell a lot about the supremacy of static typing).
-* experiment with a heterogenous solution.  I'll be building the same thing in both languages so I think some interesting comparisons could arise with regard to things like deployment, configuration and performance.
+* experiment with a heterogeneous solution.  I'll be building the same thing in both languages so I think some interesting comparisons could arise with regard to things like deployment, configuration and performance.
 
 Naturally I'm going to make a few rules for myself, the first and most important being that I'm not going to hide my mistakes.  When I change my mind or screw up, all the details will be in the commit history.  Second, the whole thing will be open source so that anyone will be able to see my pace, changes and progress in github at any time.
 Lastly, I'll welcome feedback and optimization suggestions(with credit given where credit is due) but won't accept pull requests or massive rewrites from anyone - this is mine to learn and mess up.
@@ -57,7 +57,7 @@ The nice-to-have features will be:
 The basic technical bits:
 
 * This will be a single monolithic project, no interdependent services.
-* It will be heterogenous in that I want to be able to run the Erlang version side by side with the Clojure version in the same cluster, off the same database, behind the same load balancer and things should Just Work (TM).
+* It will be heterogeneous in that I want to be able to run the Erlang version side by side with the Clojure version in the same cluster, off the same database, behind the same load balancer and things should Just Work (TM).
 * I'm going to use standard web frameworks, likely [Noir](http://webnoir.org) and either [Chicago Boss](http://chicagoboss.org) or [Nitrogen](http://nitrogenproject.com)
 * The only data store I'll be using is Riak.
 
