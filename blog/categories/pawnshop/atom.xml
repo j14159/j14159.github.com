@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: PawnShop | NoisyCode]]></title>
+  <link href="http://j14159.github.com/blog/categories/pawnshop/atom.xml" rel="self"/>
+  <link href="http://j14159.github.com/"/>
+  <updated>2012-10-21T18:44:29-07:00</updated>
+  <id>http://j14159.github.com/</id>
+  <author>
+    <name><![CDATA[Jeremy Pierre]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Learning Erlang + Clojure For Some Good]]></title>
+    <link href="http://j14159.github.com/blog/2012/10/21/pawnshop-in-which-i-learn-erlang-and-clojure-for-some-good/"/>
+    <updated>2012-10-21T17:22:00-07:00</updated>
+    <id>http://j14159.github.com/blog/2012/10/21/pawnshop-in-which-i-learn-erlang-and-clojure-for-some-good</id>
+    <content type="html"><![CDATA[<h2>Background</h2>
+
+<p>Since pretty much everything I do at my <a href="http://twitter.com/hootsuite">day job</a> involves Akka and Scala, Erlang's been on my radar for quite a while.  Using RabbitMQ in current products and considering Riak to solve some nasty storage issues has of course heightened my interest in it as well.  Thanks to <a href="http://twitter.com/ujm">@ujm</a> and <a href="http://twitter.com/tavisrudd">@tavisrudd</a> I've also been hearing a lot about Clojure for the past year or so and it has (not so) mysteriously turned up in a few testing tools at the aforementioned day job due to <a href="http://twitter.com/ujm">@ujm</a>'s unbridled love for it.  As I've been trying to improve my own approach to and understanding of functional programming, it seemed both natural and frankly exciting to dive into something involving both.</p>
+
+<h2>The Pitfall</h2>
+
+<p>This brings up a minor pet peeve of mine:  while evaluating something new and interesting, people often come up with trivial example projects and in the past, I've been possibly more guilty than most.  This is something I want very much to avoid now.  The problems I've seen in myself with using something <em>too</em> trivial to evaluate and learn new things are:</p>
+
+<ul>
+<li>performance assumptions are never grounded in reality when your code doesn't do anything realistic.  A perfect example is testing concurrent websocket connection limits that simply echo input (I did this with Play! 2.0 and I've seen some naive numbers from the node.js crowd mentioned lately as well).</li>
+<li>simple projects rarely expose some of the strange corners of a language or platform.  Anyone who has extensively used Scala's implicits or made extensive use of futures and promises will understand this.</li>
+<li>most importantly overly trivial projects won't expose your <strong>own</strong> weaknesses and misunderstandings early on.</li>
+</ul>
+
+
+<h2>Some Goals</h2>
+
+<p>Given the above, there are a few specific challenges I'm looking to work on with this project in both Erlang and Clojure:</p>
+
+<ul>
+<li>unique ID generation without a central locking resource.  I want to be able to establish total ordering without any central coordination.  <em>Loose</em> temporal ordering is a nice to have.</li>
+<li>horizontal scale, add and remove additional resources with no coordination required beyond some configuration.  As long as nodes can get in touch with the database, they should continue to function.</li>
+</ul>
+
+
+<p>And I have a few goals specific to Clojure and Erlang:</p>
+
+<ul>
+<li>learn to use their build tools (Leiningen and Rebar)</li>
+<li>loosen my reliance on object orientation</li>
+<li>get more comfortable with dynamic typing (I tend to yell a lot about the supremacy of static typing).</li>
+<li>experiment with a heterogenous solution.  I'll be building the same thing in both languages so I think some interesting comparisons could arise with regard to things like deployment, configuration and performance.</li>
+</ul>
+
+
+<p>Naturally I'm going to make a few rules for myself, the first and most important being that I'm not going to hide my mistakes.  When I change my mind or screw up, all the details will be in the commit history.  Second, the whole thing will be open source so that anyone will be able to see my pace, changes and progress in github at any time.
+Lastly, I'll welcome feedback and optimization suggestions(with credit given where credit is due) but won't accept pull requests or massive rewrites from anyone - this is mine to learn and mess up.</p>
+
+<h2>The Actual Project</h2>
+
+<p>I'm going to build a simple URL shortener and image hosting service called <a href="http://github.com/j14159/PawnShop">PawnShop</a> with the following basic features:</p>
+
+<ul>
+<li>exchange a URL for a short hash</li>
+<li>redirect short URLs to originals</li>
+<li>upload an image (png/jpeg) in return for a short hash</li>
+<li>redirect HTTP requests for a URL hash to the original</li>
+<li>display the matching submitted image for a given requested hash</li>
+<li>track click stats for each hash generated.  I'll store these at millisecond resolution.</li>
+<li>display hosted images inside a minimal template</li>
+<li>provide a REST API to retrieve click stats, likely report by one hour intervals at the smallest at first.</li>
+<li>basic authentication via email address and password</li>
+</ul>
+
+
+<p>The nice-to-have features will be:</p>
+
+<ul>
+<li>click stat reports/graphs with D3.js</li>
+<li>pluggable authentication</li>
+</ul>
+
+
+<p>The basic technical bits:</p>
+
+<ul>
+<li>This will be a single monolithic project, no interdependent services.</li>
+<li>It will be heterogenous in that I want to be able to run the Erlang version side by side with the Clojure version in the same cluster, off the same database, behind the same load balancer and things should Just Work (TM).</li>
+<li>I'm going to use standard web frameworks, likely <a href="http://webnoir.org">Noir</a> and either <a href="http://chicagoboss.org">Chicago Boss</a> or <a href="http://nitrogenproject.com">Nitrogen</a></li>
+<li>The only data store I'll be using is Riak.</li>
+</ul>
+
+
+<h2>Following Along</h2>
+
+<p>I'm going to aim for roughly a post-per-week here.  Blog posts related to PawnShop will essentially be a notebook/journal of my reasoning for certain decisions as well as both negative and positive experiences throughout the learning and development process.</p>
+
+<p><a href="http://github.com/j14159/PawnShop"><strong>GitHub</strong></a></p>
+
+<p><a href="https://trello.com/board/pawnshop/5084584abfe3e0931a00fdce"><strong>Trello</strong></a></p>
+
+<h2>Riak and the Data Model</h2>
+
+<p>A while ago, <a href="http://twitter.com/jamesgolick">@jamesgolick</a> told me I wasn't allowed to use Riak until I had read the famous Dynamo paper in its entirety.  He's right, and you should <a href="http://s3.amazonaws.com/AllThingsDistributed/sosp/amazon-dynamo-sosp2007.pdf">read it too</a> if you haven't yet.</p>
+
+<p>A URL shortener model seems a great fit for an eventually consistent Dynamo-style store like Riak.</p>
+
+<ul>
+<li>To shorten URLs and host pictures, you want high consistency for DB writes meaning that when a user submits new data, you want the write to complete with reasonable certainty.</li>
+<li>To retrieve URLs, low read consistency (small quorum) is OK.  Since we're not <strong>mutating</strong> URL and picture entries, we don't have to worry about an update that might not have hit replicas yet.</li>
+<li>To add and retrieve click stats, low read and write consistency is fine.  Missing one or two clicks out of thousands for a single report isn't the end of the world, we just want reasonable accuracy when the stats are requested and eventually high accuracy.  If it takes a few hours for this to happen, so be it.</li>
+</ul>
+
+
+<h2>Assumptions/Dependencies</h2>
+
+<h3>statsd</h3>
+
+<p>Since I'm going to monitor the hell out of everything, I'll assume something statsd-compatible is available wherever this project runs.  These days I don't think this is really an option at all for any sort of sane environment.</p>
+
+<h2>Next Steps</h2>
+
+<p>The next few posts will likely cover the following topics:</p>
+
+<ul>
+<li>decentralized ID/hash generation</li>
+<li>Riak model for shortened links and picture data</li>
+<li>Riak model for click stats</li>
+</ul>
+
+
+<p>But those could change at any time.</p>
+
+<p>Comments/questions always welcome on <a href="http://twitter.com/j14159">Twitter</a></p>
+]]></content>
+  </entry>
+  
+</feed>
