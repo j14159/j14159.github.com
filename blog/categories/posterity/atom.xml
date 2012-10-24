@@ -4,7 +4,7 @@
   <title><![CDATA[Category: posterity | NoisyCode]]></title>
   <link href="http://j14159.github.com/blog/categories/posterity/atom.xml" rel="self"/>
   <link href="http://j14159.github.com/"/>
-  <updated>2012-10-23T20:01:38-07:00</updated>
+  <updated>2012-10-23T20:02:52-07:00</updated>
   <id>http://j14159.github.com/</id>
   <author>
     <name><![CDATA[Jeremy Pierre]]></name>
@@ -18,7 +18,7 @@
     <link href="http://j14159.github.com/blog/2012/10/23/posterity-00-ia32-memory-management/"/>
     <updated>2012-10-23T19:37:00-07:00</updated>
     <id>http://j14159.github.com/blog/2012/10/23/posterity-00-ia32-memory-management</id>
-    <content type="html"><![CDATA[<p>Roughly 10 years ago, <a href="http://www.semisafe.com/">Cameron</a> and I were roommates.  At the time, he was getting into computer security and talking about NOP sleds and shell code and I ranted about how the Intel memory model <em>could</em> prevent it if people used it correctly.  Thankfully he talked me out of writing something antagonistic and a brief <a href="https://dl.dropbox.com/u/84389790/memory.pdf">introduction to Intel memory management</a> resulted.</p>
+    <content type="html"><![CDATA[<p>Roughly 10 years ago, <a href="http://www.semisafe.com/">Cameron</a> and I were roommates.  At the time, he was getting into computer security, talking about NOP sleds and shell code while I ranted about how the Intel memory model <em>could</em> prevent it if people used it correctly.  Thankfully he talked me out of writing something antagonistic and a brief <a href="https://dl.dropbox.com/u/84389790/memory.pdf">introduction to Intel memory management</a> resulted.</p>
 
 <p>There are some notable weaknesses including:</p>
 
