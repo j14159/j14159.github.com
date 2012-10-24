@@ -1,0 +1,17 @@
+---
+layout: post
+title: "Posterity 00:  IA32 Memory Management"
+date: 2012-10-23 19:37
+comments: true
+categories: [posterity, low level, Intel]
+---
+
+Roughly 10 years ago, [Cameron](http://www.semisafe.com/) and I were roommates.  At the time, he was getting into computer security and talking about NOP sleds and shell code and I ranted about how the Intel memory model _could_ prevent it if people used it correctly.  Thankfully he talked me out of writing something antagonistic and a brief [introduction to Intel memory management](https://dl.dropbox.com/u/84389790/memory.pdf) resulted.
+
+There are some notable weaknesses including:
+
+* no mention of how caching figures in
+* little to no talk of actually securing things
+* it's IA32, so kind of out of date (bear in mind this was 10 years ago)
+
+I intended some sort of followup that covered safer process address space construction using non-executable heaps but unfortunately never got around to it.  Nevertheless, I figured it might be of interest to some people so [share and enjoy](https://dl.dropbox.com/u/84389790/memory.pdf).
