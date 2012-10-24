@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: posterity | NoisyCode]]></title>
+  <link href="http://j14159.github.com/blog/categories/posterity/atom.xml" rel="self"/>
+  <link href="http://j14159.github.com/"/>
+  <updated>2012-10-23T19:59:58-07:00</updated>
+  <id>http://j14159.github.com/</id>
+  <author>
+    <name><![CDATA[Jeremy Pierre]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Posterity 00:  IA32 Memory Management]]></title>
+    <link href="http://j14159.github.com/blog/2012/10/23/posterity-00-ia32-memory-management.markdown/"/>
+    <updated>2012-10-23T19:37:00-07:00</updated>
+    <id>http://j14159.github.com/blog/2012/10/23/posterity-00-ia32-memory-management.markdown</id>
+    <content type="html"><![CDATA[<p>Roughly 10 years ago, <a href="http://www.semisafe.com/">Cameron</a> and I were roommates.  At the time, he was getting into computer security and talking about NOP-sleds and shell code and I ranted about how the Intel memory model <em>could</em> prevent it if people used it correctly.  Thankfully he talked me out of writing something antagonistic and an <a href="https://dl.dropbox.com/u/84389790/memory.pdf">introduction to Intel memory management</a> resulted.</p>
+
+<p>There are some notable weaknesses including:</p>
+
+<ul>
+<li>no mention of how caching figures in</li>
+<li>little to no talk of actually securing things</li>
+<li>it's IA32, so kind of out of date</li>
+</ul>
+
+
+<p>Nevertheless, I figured it might be of interest to some people so <a href="https://dl.dropbox.com/u/84389790/memory.pdf">share and enjoy</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Posterity 00:  IA32 Memory Management]]></title>
+    <link href="http://j14159.github.com/blog/2012/10/23/posterity-00-ia32-memory-management/"/>
+    <updated>2012-10-23T19:37:00-07:00</updated>
+    <id>http://j14159.github.com/blog/2012/10/23/posterity-00-ia32-memory-management</id>
+    <content type="html"><![CDATA[<p>Roughly 10 years ago, <a href="http://www.semisafe.com/">Cameron</a> and I were roommates.  At the time, he was getting into computer security and talking about NOP sleds and shell code and I ranted about how the Intel memory model <em>could</em> prevent it if people used it correctly.  Thankfully he talked me out of writing something antagonistic and a brief <a href="https://dl.dropbox.com/u/84389790/memory.pdf">introduction to Intel memory management</a> resulted.</p>
+
+<p>There are some notable weaknesses including:</p>
+
+<ul>
+<li>no mention of how caching figures in</li>
+<li>little to no talk of actually securing things</li>
+<li>it's IA32, so kind of out of date (bear in mind this was 10 years ago)</li>
+</ul>
+
+
+<p>I intended some sort of followup that covered safer process address space construction using non-executable heaps but unfortunately never got around to it.  Nevertheless, I figured it might be of interest to some people so <a href="https://dl.dropbox.com/u/84389790/memory.pdf">share and enjoy</a>.</p>
+]]></content>
+  </entry>
+  
+</feed>
