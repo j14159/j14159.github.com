@@ -6,7 +6,7 @@ comments: true
 categories: [posterity, low level, Intel]
 ---
 
-Roughly 10 years ago, [Cameron](http://www.semisafe.com/) and I were roommates.  At the time, he was getting into computer security and talking about NOP sleds and shell code and I ranted about how the Intel memory model _could_ prevent it if people used it correctly.  Thankfully he talked me out of writing something antagonistic and a brief [introduction to Intel memory management](https://dl.dropbox.com/u/84389790/memory.pdf) resulted.
+Roughly 10 years ago, [Cameron](http://www.semisafe.com/) and I were roommates.  At the time, he was getting into computer security, talking about NOP sleds and shell code while I ranted about how the Intel memory model _could_ prevent it if people used it correctly.  Thankfully he talked me out of writing something antagonistic and a brief [introduction to Intel memory management](https://dl.dropbox.com/u/84389790/memory.pdf) resulted.
 
 There are some notable weaknesses including:
 
