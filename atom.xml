@@ -4,7 +4,7 @@
   <title><![CDATA[NoisyCode]]></title>
   <link href="http://j14159.github.com/atom.xml" rel="self"/>
   <link href="http://j14159.github.com/"/>
-  <updated>2012-10-23T20:02:52-07:00</updated>
+  <updated>2013-02-02T18:29:31-08:00</updated>
   <id>http://j14159.github.com/</id>
   <author>
     <name><![CDATA[Jeremy Pierre]]></name>
@@ -12,6 +12,127 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Parser N00b]]></title>
+    <link href="http://j14159.github.com/blog/2013/02/02/parser-n00b/"/>
+    <updated>2013-02-02T14:27:00-08:00</updated>
+    <id>http://j14159.github.com/blog/2013/02/02/parser-n00b</id>
+    <content type="html"><![CDATA[<h1>Or: WTF, A LISP in Scala?</h1>
+
+<p><a href="https://github.com/j14159/BadLisp">Project link for the lazy</a></p>
+
+<h2>How Did It Come To This?</h2>
+
+<p>Some background first.  At my <a href="http://hootsuite.com">day job</a>, we&#8217;ve ended up writing a lot of boilerplate for REST endpoints with Netty (it&#8217;s relevant, I&#8217;ll get to the LISP bit soon).  While I don&#8217;t want to get into it too much as we&#8217;ll likely be open-sourcing the results, we didn&#8217;t go with bigger solutions (e.g. Jetty, Scalatra, Play) because when you do, you&#8217;re making one or more of the following trade-offs (at minimum) in favour of an easier API for writing HTTP stuff:</p>
+
+<ul>
+<li>lack of visibility into how concurrency is handled at all levels of your application</li>
+<li>much bigger artifacts to deploy (unless you&#8217;re a ProGuard ninja)</li>
+<li>dealing with someone else&#8217;s assumptions about how HTTP-involved code (not necessarily a full &#8220;web app&#8221;) should be written</li>
+</ul>
+
+
+<p>That third point is fuel for a much longer post/many discussions well outside the scope of this one.  I&#8217;m happy to drink beer and yell about it with you if you&#8217;re ever in Vancouver.</p>
+
+<p>To be clear:  the above points <strong>DO NOT MATTER</strong> if you&#8217;re writing something that&#8217;s going on decent hardware (big servers) and/or you&#8217;re only dealing with a few hundred concurrent connections with DB/cache/distributed communication involved (echo and static file servers are a completely different story).  Even that still depends greatly on the nature of your app and where you&#8217;re running it.  The first point can also be mitigated by diving into the source for whatever library/framework you select but that will only get you so far, especially if you&#8217;ve got a larger team.  We went the direction that we did because we need to deal with thousands of concurrent inbound connections per server with lots of DB and cache interactions on M1 medium through M1 large EC2 VMs. In this situation transparency and simple configurability at each layer of the application are necessities.</p>
+
+<p>Just in case:  there are other reasons we didn&#8217;t go with Finatra but I&#8217;ve already gone on too long.</p>
+
+<h3>Getting To The LISP Bit</h3>
+
+<p>The upshot of everything I said above is that we needed a basic routing DSL/library on top of Netty.  Since we need to provide both static and dynamic paths, it seemed natural to start looking at combinatorial parsers (if you&#8217;re curious, go read <a href="http://www.codecommit.com/blog/scala/the-magic-behind-parser-combinators">this post</a> by <a href="https://twitter.com/djspiewak">Daniel Spiewak</a>).  After some initial fumbling with regex and possible path parsers, I decided to see what I could do with S-expressions.  This was the initial result:</p>
+
+<div><script src='https://gist.github.com/4424770.js?file='></script>
+<noscript><pre><code>import scala.util.parsing.combinator._
+
+sealed trait Term
+
+case class Number(v: Double) extends Term
+case class Id(v: String) extends Term
+case class SExp(terms: List[Term]) extends Term
+
+object SExpParser extends RegexParsers {
+  def number: Parser[Number] = &quot;&quot;&quot;\d+(\.\d+)?&quot;&quot;&quot;.r ^^ { d =&gt; Number(d.toDouble) }
+  def id: Parser[Id] = &quot;&quot;&quot;[a-zA-Z\*\/\+\-&lt;&gt;=?!]+[a-zA-Z\*\/\+\-&lt;&gt;=0-9?!]*&quot;&quot;&quot;.r ^^ { i =&gt; Id(i) }
+  def sexp: Parser[SExp] = &quot;(&quot; ~&gt; rep(number | id | sexp) &lt;~ &quot;)&quot; ^^ { l =&gt; SExp(l) }
+
+  def tryIt(expression: String) = parseAll(sexp, expression)
+}
+
+object Example {
+  def succeeds() = {
+    val examples = List(
+      &quot;(&gt; 0 9)&quot;,
+      &quot;(define (aFunction x y) (+ x y))&quot;,
+      &quot;(?test a 2)&quot;,
+      &quot;(some! (slightly? 0 (+ nested (stuff (* to (test 0))))))&quot;)
+
+    examples map SExpParser.tryIt
+  }
+
+  def fails() = {
+    SExpParser.tryIt(&quot;(unmatched (parens)&quot;)
+  }
+}
+</code></pre></noscript></div>
+
+
+<p>Once I had progressed a bit further, it seemed natural to see how easily I could add simple evaluation of basic math operators (+, -, / and *).</p>
+
+<p>Short answer:  <em>easy</em></p>
+
+<p>Result:  I got sucked in and went overboard, <a href="https://github.com/j14159/BadLisp">clearly</a>.</p>
+
+<h2>A Slight Tangent</h2>
+
+<p>Before I get into what was good and bad about my first LISP implementation experience, it bears briefly demonstrating the way these experiments have resulted in a solution for the original problem:  we need a simple, transparent, configurable routing layer on top of Netty.  Our library &#8220;Floor&#8221; was built with a single goal in mind - ruthless minimalism while staying <a href="http://en.wikipedia.org/wiki/Don't_repeat_yourself">DRY</a>.</p>
+
+<p>Here&#8217;s a very simple example of what Floor lets you do:</p>
+
+<div><script src='https://gist.github.com/4699916.js?file='></script>
+<noscript><pre><code>&quot;/hello/:name&quot; get {
+  request =&gt; Future {
+    /*
+    * we're in The Future here so you can do 
+    * heavier stuff without blocking up other
+    * things like the Netty handler.
+    */
+    val name = request.path(&quot;:name&quot;)
+    Response.ok(s&quot;Hello, ${name}&quot;)
+  }
+}</code></pre></noscript></div>
+
+
+<p>There&#8217;s a bit more to it than that but I&#8217;m sure you get the idea.</p>
+
+<h2>The Good Stuff</h2>
+
+<p>I got to dig a bit further into a couple areas that I haven&#8217;t before and they&#8217;re worth mentioning.  If/when Floor goes open source, you&#8217;ll see a lot of the same stuff in it.</p>
+
+<h3>Partial Functions and Pattern Matching</h3>
+
+<p>Looking at the various traits that are bolted onto the <a href="https://github.com/j14159/BadLisp">BadLisp</a> interpreter, you&#8217;ll see that pretty much everything is done via filtering lists of partial functions based on pattern matching.  Both special forms (like &#8220;if-then-else&#8221;) and the simple built-in functions (e.g. +, -, car) are implemented this way.  Check out <a href="https://github.com/j14159/BadLisp/blob/master/src/main/scala/com/noisycode/Conditionals.scala">Conditionals.scala</a> for a brief example.  I generally like this approach and for the most part find it clean but it <em>does</em> have some downsides which I&#8217;ll touch on shortly.</p>
+
+<h3>Implicit Classes</h3>
+
+<p>New in Scala 2.10, I&#8217;m sure they&#8217;ll be as contentious as implicit defs and vals were before.  Regardless, I stuck one in for the <a href="https://github.com/j14159/BadLisp/blob/master/src/main/scala/com/noisycode/Comparisons.scala">Comparisons</a> trait.  I treat it a little bit like a type class in that it allows certain value-based methods to be used with classes <a href="https://github.com/j14159/BadLisp">BadLisp</a> considers to be concrete values.  I suspect based on some of the reading I&#8217;ve done that this is not precisely what is meant by type classes in Scala but I think it&#8217;s a step in the right direction for the moment.</p>
+
+<h2>The Bad Stuff</h2>
+
+<h3>Not Enough Implicit Classes</h3>
+
+<p>Again, probably a contentious point.  I do get the feeling, however, that I could have simplified even more with judicious use of these.  It&#8217;s not something I&#8217;m going to go back and refactor for but something I&#8217;m going to keep top of mind for future stuff.  Please do weigh in via comments or <a href="http://twitter.com/j14159">Twitter</a> if you have strong feelings one way or the other about this though.</p>
+
+<h3>Partial Functions and the Symbol Table</h3>
+
+<p>Because my symbol table is simply a big list of partial functions that I match against, it&#8217;s a bit clunky to look up or alias things in the case of higher order functions (I just wrapped this one up this morning).  I&#8217;m not especially proud of how functions and scope <a href="https://github.com/j14159/BadLisp/blob/master/src/main/scala/com/noisycode/Definitions.scala">are handled</a> at present but I think I&#8217;m going to leave well enough alone as I seriously doubt this is the last time I try to implement something like this.</p>
+
+<h2>Next</h2>
+
+<p>I won&#8217;t be working on this particular interpreter further but am happy to talk about anything you find deficient and/or interesting on <a href="http://twitter.com/j14159">Twitter</a> or in the comments.  Next steps for me are getting back to <a href="https://github.com/j14159/PawnShop">PawnShop</a> and/or experimenting with some Actor and Disruptor implementations I think.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Posterity 00:  IA32 Memory Management]]></title>
