@@ -1,0 +1,65 @@
+---
+layout: post
+title: "Parser N00b"
+date: 2013-02-02 14:27
+comments: true
+categories: 
+---
+#Or: WTF, A LISP in Scala?
+
+[Project link for the lazy](https://github.com/j14159/BadLisp)
+
+##How Did It Come To This?
+Some background first.  At my [day job](http://hootsuite.com), we've ended up writing a lot of boilerplate for REST endpoints with Netty (it's relevant, I'll get to the LISP bit soon).  While I don't want to get into it too much as we'll likely be open-sourcing the results, we didn't go with bigger solutions (e.g. Jetty, Scalatra, Play) because when you do, you're making one or more of the following trade-offs (at minimum) in favour of an easier API for writing HTTP stuff:
+
+* lack of visibility into how concurrency is handled at all levels of your application
+* much bigger artifacts to deploy (unless you're a ProGuard ninja)
+* dealing with someone else's assumptions about how HTTP-involved code (not necessarily a full "web app") should be written
+
+That third point is fuel for a much longer post/many discussions well outside the scope of this one.  I'm happy to drink beer and yell about it with you if you're ever in Vancouver.
+
+To be clear:  the above points **DO NOT MATTER** if you're writing something that's going on decent hardware (big servers) and/or you're only dealing with a few hundred concurrent connections with DB/cache/distributed communication involved (echo and static file servers are a completely different story).  Even that still depends greatly on the nature of your app and where you're running it.  The first point can also be mitigated by diving into the source for whatever library/framework you select but that will only get you so far, especially if you've got a larger team.  We went the direction that we did because we need to deal with thousands of concurrent inbound connections per server with lots of DB and cache interactions on M1 medium through M1 large EC2 VMs. In this situation transparency and simple configurability at each layer of the application are necessities.
+
+Just in case:  there are other reasons we didn't go with Finatra but I've already gone on too long.
+
+###Getting To The LISP Bit
+
+The upshot of everything I said above is that we needed a basic routing DSL/library on top of Netty.  Since we need to provide both static and dynamic paths, it seemed natural to start looking at combinatorial parsers (if you're curious, go read [this post](http://www.codecommit.com/blog/scala/the-magic-behind-parser-combinators) by [Daniel Spiewak](https://twitter.com/djspiewak)).  After some initial fumbling with regex and possible path parsers, I decided to see what I could do with S-expressions.  This was the initial result:
+
+{% gist 4424770 %}
+
+Once I had progressed a bit further, it seemed natural to see how easily I could add simple evaluation of basic math operators (+, -, / and *).
+
+Short answer:  *easy*
+
+Result:  I got sucked in and went overboard, [clearly](https://github.com/j14159/BadLisp).
+
+##A Slight Tangent
+Before I get into what was good and bad about my first LISP implementation experience, it bears briefly demonstrating the way these experiments have resulted in a solution for the original problem:  we need a simple, transparent, configurable routing layer on top of Netty.  Our library "Floor" was built with a single goal in mind - ruthless minimalism while staying [DRY](http://en.wikipedia.org/wiki/Don't_repeat_yourself).
+
+Here's a very simple example of what Floor lets you do:
+
+{% gist 4699916 %}
+
+There's a bit more to it than that but I'm sure you get the idea.
+
+##The Good Stuff
+I got to dig a bit further into a couple areas that I haven't before and they're worth mentioning.  If/when Floor goes open source, you'll see a lot of the same stuff in it.
+
+###Partial Functions and Pattern Matching
+Looking at the various traits that are bolted onto the [BadLisp](https://github.com/j14159/BadLisp) interpreter, you'll see that pretty much everything is done via filtering lists of partial functions based on pattern matching.  Both special forms (like "if-then-else") and the simple built-in functions (e.g. +, -, car) are implemented this way.  Check out [Conditionals.scala](https://github.com/j14159/BadLisp/blob/master/src/main/scala/com/noisycode/Conditionals.scala) for a brief example.  I generally like this approach and for the most part find it clean but it *does* have some downsides which I'll touch on shortly.
+
+###Implicit Classes
+New in Scala 2.10, I'm sure they'll be as contentious as implicit defs and vals were before.  Regardless, I stuck one in for the [Comparisons](https://github.com/j14159/BadLisp/blob/master/src/main/scala/com/noisycode/Comparisons.scala) trait.  I treat it a little bit like a type class in that it allows certain value-based methods to be used with classes [BadLisp](https://github.com/j14159/BadLisp) considers to be concrete values.  I suspect based on some of the reading I've done that this is not precisely what is meant by type classes in Scala but I think it's a step in the right direction for the moment.
+
+##The Bad Stuff
+
+###Not Enough Implicit Classes
+Again, probably a contentious point.  I do get the feeling, however, that I could have simplified even more with judicious use of these.  It's not something I'm going to go back and refactor for but something I'm going to keep top of mind for future stuff.  Please do weigh in via comments or [Twitter](http://twitter.com/j14159) if you have strong feelings one way or the other about this though.
+
+###Partial Functions and the Symbol Table
+Because my symbol table is simply a big list of partial functions that I match against, it's a bit clunky to look up or alias things in the case of higher order functions (I just wrapped this one up this morning).  I'm not especially proud of how functions and scope [are handled](https://github.com/j14159/BadLisp/blob/master/src/main/scala/com/noisycode/Definitions.scala) at present but I think I'm going to leave well enough alone as I seriously doubt this is the last time I try to implement something like this.
+
+##Next
+I won't be working on this particular interpreter further but am happy to talk about anything you find deficient and/or interesting on [Twitter](http://twitter.com/j14159) or in the comments.  Next steps for me are getting back to [PawnShop](https://github.com/j14159/PawnShop) and/or experimenting with some Actor and Disruptor implementations I think.
+
