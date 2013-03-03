@@ -16,6 +16,9 @@ I'll give you the link to play, don't worry, just a couple quick things...
 ##How Long Will It Work For?
 I'm going to keep it live (aside from crashes, etc) for at least a couple of weeks I think.
 
+##What You Need:
+A browser that supports websockets and HTML canvas.  Think recent versions of Chrome and Firefox, Safari _should_ work.
+
 ##Problems You Can Expect
 ###It's Ugly
 And I know.  No explosions yet, very minimal.
