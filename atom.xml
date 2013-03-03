@@ -4,7 +4,7 @@
   <title><![CDATA[NoisyCode]]></title>
   <link href="http://j14159.github.com/atom.xml" rel="self"/>
   <link href="http://j14159.github.com/"/>
-  <updated>2013-03-02T16:35:06-08:00</updated>
+  <updated>2013-03-02T16:35:53-08:00</updated>
   <id>http://j14159.github.com/</id>
   <author>
     <name><![CDATA[Jeremy Pierre]]></name>
@@ -32,7 +32,7 @@
 
 <h2>What You Need:</h2>
 
-<p>A browser that supports websockets and HTML canvas.  Think recent versions of Chrome and Firefox, I <em>think</em> Safari will work.</p>
+<p>A browser that supports websockets and HTML canvas.  Think recent versions of Chrome and Firefox, Safari <em>should</em> work.</p>
 
 <h2>Problems You Can Expect</h2>
 
