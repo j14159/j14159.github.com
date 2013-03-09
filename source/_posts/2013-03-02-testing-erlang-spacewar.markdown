@@ -3,7 +3,7 @@ layout: post
 title: "Testing Erlang Spacewar"
 date: 2013-03-02 15:31
 comments: true
-categories: 
+categories: [erlang, spacewar]
 ---
 ##What's Erlang Spacewar?
 
