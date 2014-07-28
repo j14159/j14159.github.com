@@ -4,7 +4,7 @@
   <title><![CDATA[NoisyCode]]></title>
   <link href="http://noisycode.com/atom.xml" rel="self"/>
   <link href="http://noisycode.com/"/>
-  <updated>2014-07-27T17:50:14-07:00</updated>
+  <updated>2014-07-27T17:50:41-07:00</updated>
   <id>http://noisycode.com/</id>
   <author>
     <name><![CDATA[Jeremy Pierre]]></name>
@@ -12,6 +12,271 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Akka and JDBC to Services]]></title>
+    <link href="http://noisycode.com/blog/2014/07/27/akka-and-jdbc-to-services/"/>
+    <updated>2014-07-27T14:05:00-07:00</updated>
+    <id>http://noisycode.com/blog/2014/07/27/akka-and-jdbc-to-services</id>
+    <content type="html"><![CDATA[<p>I started mapping out this post over a month ago after I saw another question about how to handle blocking database calls on the Akka mailing list.  I&rsquo;ve been working towards most of what follows over the last year and after discussing the basics with a few others in the <a href="http://www.meetup.com/PolyglotVancouver/">Vancouver Polyglot</a> community with some additional prompting from <a href="https://twitter.com/saemg">Saem</a>, I finally put this together (<a href="https://github.com/j14159/akka-jdbc-post">project link</a> for the lazy).</p>
+
+<p>This represents my current thinking (as of roughly July 2014) about a reasonable approach to the problems of state, blocking, and failure for data store interaction within the confines of Scala and Akka.  This post specifically focuses on JDBC connections but is roughly applicable to any system that provides a blocking API.  I define &ldquo;reasonable approach&rdquo; to be one that has significant enough upsides to combat its explicitly acknowledged weaknesses and negatives (I&rsquo;ll get to those towards the end).  The particular approach I&rsquo;m outlining here is a way to structure an application such that you have some reasonable flexibility later on and some clear benefits up front, yielding a future-viable design.</p>
+
+<h1>Actors And Databases</h1>
+
+<p>The initial question often seems to be &ldquo;how do I handle JDBC/blocking calls with Akka&rdquo;, the answer to
+which almost always involves &ldquo;bulkheading&rdquo; which we&rsquo;ll get to a bit later in this post.  The issue I want to tackle first is one of state.</p>
+
+<p>Database connections:</p>
+
+<ul>
+<li><em>Are</em> state</li>
+<li>Have a lifecycle (connected, in-transaction, disconnected, etc)</li>
+<li>Are prone to errors (timeouts, network partitions, etc)</li>
+</ul>
+
+
+<p>Database connection lifecycles should be tied directly to an actor&rsquo;s lifecycle with errors on the connection handled by supervision.  A 1:1 Connection:<a href="http://en.wikipedia.org/wiki/Data_access_object">DAO</a> actor is specifically what I am advocating.  I don&rsquo;t think the DAO approach suffers from lack of acceptance or understanding so I&rsquo;m not going to get into specifics about it here.  The basics around actor-connection coupling are as follows:</p>
+
+<ul>
+<li><p>Actors get a connection factory method with the most basic type being <code>() =&gt; java.sql.Connection</code>.</p>
+
+<p>This method can be constructed elsewhere, closing over the necessary <em>immutable</em> state required to instantiate a connection, e.g. JDBC URL.</p></li>
+<li><p>On any crash, the connection simply gets closed and the replacement actor instance will lazily recreate its required connection.  Supervision strategies and preRestart() behaviour can be easily tailored to not always kill the connection as this default behaviour is obviously not always desirable.  Tearing down the connection and starting a new actor instance on a column index error is clearly extreme.</p></li>
+</ul>
+
+
+<div><script src='https://gist.github.com/00b097487976b6486513.js'></script>
+<noscript><pre><code>  val databaseUrl = &quot;postgresql://some-hostname:5432/db-name&quot;
+
+  Class.forName(&quot;my.sql.database.driver.classname&quot;)
+
+  class BasicJdbcActor(connFac: () =&gt; Connection) extends Actor {
+    lazy val conn = connFac()
+
+    override def preRestart(why: Throwable, msg: Option[Any]): Unit = 
+      try { conn.close() }
+    
+    def receive = {
+      case anything =&gt; throw new Exception(&quot;Where's my implementation?&quot;)
+    }
+  }
+
+  def connFac = () =&gt; DriverManager.getConnection(databaseUrl)
+
+  def makeMeAnActor(sys: ActorSystem): ActorRef = 
+    sys.actorOf(Props(new BasicJdbcActor(connFac)))
+</code></pre></noscript></div>
+
+
+<p>Anyone who has deployed Erlang/OTP or Akka applications into a production will have noticed the problem that I have just introduced:  Akka actors (like processes and gen_servers in Erlang) by default have an <strong>unbounded</strong> mailbox.  Since we&rsquo;re making blocking calls inside the database actor, when a burst of requests occurs they will all queue inside the actor&rsquo;s mailbox without any sort of back pressure.  Parallelism <em>partially</em> helps to solve this problem.</p>
+
+<h2>Parallelism and Pooling</h2>
+
+<p><a href="http://www.amazon.com/Release-It-Production-Ready-Pragmatic-Programmers/dp/0978739213">Release It!</a> advocates against writing one&rsquo;s own connection pool and in general I think Mr Nygard puts it fairly well:</p>
+
+<blockquote><p>&hellip;I oppose anyone rolling their own connection pool class.  It is always more difficult than you
+think to make a reliable, safe, high-performance connection pool.</p></blockquote>
+
+<p>Having said that, I will now happily violate his basic rule as well as <a href="http://www.chrisstucchio.com/blog/2013/actors_vs_futures.html">Chris Stucchio&rsquo;s position</a> by saying the use of a <a href="http://doc.akka.io/docs/akka/2.3.4/scala/routing.html">router</a> and the previously mentioned supervision strategy applied to a pool of actors is reasonably sound, safer due to less sharing of mutable state (a traditional connection pool), and performant enough (with caveats to follow).</p>
+
+<p>Using supervision strategies to enable both configurable and <em>adaptable</em> responses to errors is better than an opaque connection pool.  Seth Falcon&rsquo;s <a href="https://github.com/seth/pooler">pooler</a> project (hat tip to <a href="https://twitter.com/jamesgolick">James</a> for suggesting it to me) is where I first started to understand how useful and fundamentally sane this approach can be.  While I think it is safe to assume that JVM connection pool implementations these days are fast enough and avoid things like <code>synchronized</code> and heavy locks, passing around a reference to such an object containing so much mutable state is at odds with much of what makes both Scala and Akka effective.</p>
+
+<p>It is important to note that a realistic supervision strategy would not cause the actor in question to restart on every exception, discarding the existing connection and creating another.  If the connection itself has no problems, &ldquo;Resume&rdquo; is a perfectly legitimate response from the strategy in many cases.  Your strategy must be
+tailored to your particular problem and requirements.</p>
+
+<div><script src='https://gist.github.com/49606a5468c734fc6a28.js'></script>
+<noscript><pre><code>// very naive, be more specific based on your problem:
+val restartStrategy = OneForOneStrategy(
+  maxNrOfRetries = 10, 
+  withinTimeRange = 1 minute) {
+  case _ =&gt; Restart
+}
+
+def newPool(sys: ActorSystem): ActorRef = {
+  val props = Props(new BasicJdbcActor(connFac))
+  val pool = RoundRobinPool(4, supervisorStrategy = restartStrategy)
+  sys.actorOf(pool.props(props))
+}
+</code></pre></noscript></div>
+
+
+<p>Those in the audience paying attention will note that even though we now have parallel handling of requests, we have still not solved the actual queue problem.  Two of the simplest solutions are:</p>
+
+<ul>
+<li>Limit the number of requests in flight with a different actor mailbox type:  <code>akka.dispatch.BoundedMailbox</code>.  The downside here is that message sends are now blocking which may add to throughput issues.</li>
+<li>Use proper timeouts with the &ldquo;ask&rdquo; pattern and a <a href="http://doc.akka.io/docs/akka/2.3.4/common/circuitbreaker.html">circuit breaker</a> to fail faster and back off.  More on this approach later.</li>
+</ul>
+
+
+<h1>Bulkheading</h1>
+
+<p>&ldquo;Bulkheading&rdquo; is a <a href="http://letitcrash.com/post/40755146949/tuning-dispatchers-in-akka-applications">pattern</a> used to protect one set of components from negative influence by one or more <em>different</em> sets of components in your system.  Here we&rsquo;re specifically concerned with preventing the set of actors making JDBC calls from using up all of the compute resources (threads) used for <em>other operations</em>, e.g. responding to web requests, recording metrics, reporting on JVM stats, etc.</p>
+
+<p>As an example, let&rsquo;s suppose you have a simple application supporting a couple of basic GET requests:</p>
+
+<ul>
+<li><code>/user/:id</code> to get a specific user object from the database by ID</li>
+<li><code>/ping</code> to check if the system is alive</li>
+</ul>
+
+
+<p>Further, let&rsquo;s assume you&rsquo;re using something like the Spray library and thus have actors servicing HTTP requests.  If your single Akka dispatcher has a maximum of N threads and you have M or more <em>parallel</em> user requests occurring at the same time, when M >= N any call to the <code>/ping</code> endpoint will block without a response until one or more of the user requests complete.  Lest you think that success or failure of these calls is guaranteed to be fast (or even to occur at all), I encourage you to read <a href="http://www.amazon.com/Release-It-Production-Ready-Pragmatic-Programmers/dp/0978739213">Release It!</a> at a minimum.</p>
+
+<p>In order to <strong>bulkhead</strong> everything else from the JDBC actors, we create a different dispatcher for the database actors and spawn them only on this separate dispatcher.  Now the non-database components will not be affected when the database actors have blocked all of their threads.  Note that this is not a panacea &ndash; should all of the database actor threads be blocked, any component that relies on this pool of actors will be prevented from making progress until earlier calls complete.</p>
+
+<p>Dispatcher configuration:</p>
+
+<div><script src='https://gist.github.com/ab55d058c118f57075ae.js'></script>
+<noscript><pre><code>my-dispatcher {
+  type = Dispatcher
+  executor = &quot;fork-join-executor&quot;
+  fork-join-executor {
+    parallelism-min = 2
+ 
+   //2 threads per core
+    parallelism-factor = 2.0
+
+    // The max that the dispatcher will create:
+    parallelism-max = 8
+  }
+}</code></pre></noscript></div>
+
+
+<p>And a minor change to our pool with a router:</p>
+
+<div><script src='https://gist.github.com/8219db85e98e2dc713d5.js'></script>
+<noscript><pre><code>val props = Props(new BasicJdbcActor(connFac))
+  .withDispatcher(&quot;my-dispatcher&quot;)
+val pool = RoundRobinPool(4, supervisorStrategy = restartStrategy)
+sys.actorOf(pool.props(props))</code></pre></noscript></div>
+
+
+<p>This is just the beginning of isolating and protecting different pools of actors and tasks (e.g. futures).  While I don&rsquo;t want to get too deep into tuning dispatchers and prioritizing access for different components, you should be aware that there are a variety of ways to affect quality-of-service for clients of your actors.  Here are some of the simplest places to start:</p>
+
+<ul>
+<li>The number of threads per dispatcher (with high and low thresholds) can be adjusted as needed.  If you need more throughput, make more actors and give them correspondingly more threads.  Don&rsquo;t forget that running more connections has its own penalties and limitations.</li>
+<li>A &ldquo;pinned&rdquo; dispatcher can be used wherein each actor gets its own thread all to itself.</li>
+<li>For higher-priority clients, give them their own larger pool of actors on yet another dispatcher if necessary (almost last resort I think).</li>
+</ul>
+
+
+<h1>DAOs</h1>
+
+<p>Those of you with some experience will note that I&rsquo;m actually conflating <a href="http://en.wikipedia.org/wiki/Data_access_object">DAO</a> and <a href="http://en.wikipedia.org/wiki/Domain-driven_design#Building_blocks_of_DDD">Aggregate Roots</a> for reasons that will become more clear shortly.</p>
+
+<p>Each aggregate root gets an actor implementation that provides all of the necessary CRUD functionality or whatever subset is needed (a DAO with a message-passing interface).  In addition I favour creating unique case classes for each type of request that the DAO actor services rather than more ambiguous strings or tuples.  All interaction with the actor is performed via the <a href="http://doc.akka.io/docs/akka/2.3.4/scala/actors.html#Ask__Send-And-Receive-Future">ask pattern</a>.</p>
+
+<p>Hiding CRUD mechanics is important because SQL or some DSL analogue appearing throughout your code and packages is a leak.  Data store details are details about serialization and with very few exceptions should <em>not</em> be leaking into your business logic.  &ldquo;Save this thing&rdquo;, &ldquo;find things that match these criteria&rdquo;, etc are not specific mechanics, they&rsquo;re closer to <em>goals</em> that need to be satisfied.  &ldquo;INSERT x INTO TABLE y&rdquo; are particulars that are not germane to your business logic.</p>
+
+<div><script src='https://gist.github.com/6aee8831ffb10747f226.js'></script>
+<noscript><pre><code>case class Person(name: String, email: String)
+case class PersonById(id: Int)
+
+class PersonDao(cf: () =&gt; Connection) extends Actor {
+  lazy val conn = cf()
+
+  override def preRestart(why: Throwable, msg: Option[Any]): Unit = 
+    try { conn.close() }
+  
+  def receive = {
+    case Person(n, e) =&gt;
+      //call insert function with above connection
+      sender ! 1 // mock person ID
+    case PersonById(id) =&gt;
+      //get person from connection above
+      sender ! Person(&quot;name&quot;, &quot;email&quot;) // mock
+  }
+}
+</code></pre></noscript></div>
+
+
+<h1>Failure as a First Class Citizen</h1>
+
+<p>Rather than the raw ask pattern, informed somewhat by common Erlang approaches to gen_server interfaces I always create a client trait  in front of the DAO actors returning <a href="http://www.scala-lang.org/api/2.10.3/?_ga=1.34556641.1524243934.1391722094#scala.concurrent.Future">Futures</a> that can easily be turned into a standalone class or object where necessary (e.g. testing).</p>
+
+<div><script src='https://gist.github.com/ca191b61a73382316f9c.js'></script>
+<noscript><pre><code>trait PersonClient {
+  // supply a router with a pool of PersonDao:
+  val personPool: ActorRef
+
+  // how long should we wait for a response from PersonDao:
+  val timeoutInMillis: Long
+
+  implicit val timeout = Timeout(timeoutInMillis millis)
+
+  def addPerson(p: Person): Future[Int] =
+    (personPool ? p).mapTo[Int]
+
+  def personById(id: Long): Future[Person] = 
+    (personPool ? PersonById).mapTo[Person]
+}
+</code></pre></noscript></div>
+
+
+<p>Why Futures?</p>
+
+<ul>
+<li>They keep failure handling front and centre via recover() and recoverWith() (I believe <a href="https://twitter.github.io/finagle/">Finagle</a> may be responsible for this).</li>
+<li>Explicitly asynchronous.</li>
+<li>Easy to combine and parallelize via map(), flatMap(), zip(), for-comprehensions, etc.</li>
+</ul>
+
+
+<p>The first point bears emphasis:  futures in Scala and Finagle expose failure and <em>doing something with that failure</em> as a primary concern.  For the simplified starting point described here, timeouts are the primary failure we&rsquo;re initially concerned with.  To that end, we can combine sensible timeouts with <a href="http://doc.akka.io/docs/akka/2.3.4/common/circuitbreaker.html">circuit breakers</a> to help solve the queue growth problem and keep our systems responsive.</p>
+
+<p>On sensible timeout values, I will defer to <a href="http://queue.acm.org/detail.cfm?id=2187821">Pat Helland</a>:</p>
+
+<blockquote><p>Some application developers may push for no timeout and argue it is OK to wait indefinitely. I typically propose they set the timeout to 30 years. That, in turn, generates a response that I need to be reasonable and not silly. Why is 30 years silly but infinity is reasonable? I have yet to see a messaging application that really wants to wait for an unbounded period of time&hellip;</p></blockquote>
+
+<p>By embracing failures as legitimate responses, we can begin to build systems that degrade gracefully and continue to function in the face of most problems that occur (see most of what has been written by the Netflix team).  This point cannot be overstated:  when talking to a data store, you are explicitly making calls to an external and <em>very probably remote</em> system of some sort and thus failure <em>must</em> be accounted for and <em>must</em> be handled.</p>
+
+<h1>Smells Like A Service</h1>
+
+<p>When constructed with the above approach, an application has effectively been built as a set of internal services.  Since all of the clients talk to the internal services via a mechanism that expects failure and encourages its proper handling, you can simply swap out the implementation behind the scenes for remote services whenever such growth is necessary, e.g.</p>
+
+<ul>
+<li><a href="http://dispatch.databinder.net/Dispatch.html">Dispatch</a> HTTP calls already return futures.</li>
+<li>Netty or Akka TCP clients writing to a <a href="http://www.scala-lang.org/api/2.10.3/?_ga=1.34556641.1524243934.1391722094#scala.concurrent.Promise">Promise</a>.</li>
+<li>Actors talking to external services via RabbitMQ, 0MQ, etc (though not what I would <em>generally</em> recommend).</li>
+</ul>
+
+
+<p>It is far simpler to move functionality to an external application (separate service) in this manner than with a more traditional DAO or ORM approach.</p>
+
+<h1>Explicit Negatives</h1>
+
+<ul>
+<li><p>Using the ask pattern means that responses from the actor are typed as <code>Any</code>, which effectively bypasses type checking.  One solution with its own issues is to send an already constructed promise with your message to the DAO actor using <code>tell</code>/<code>!</code>.  The DAO actor could then write a success or failure to this promise, yielding proper type safety but <strong>complicating</strong> timeouts.</p>
+
+<p>If you rely entirely on the Akka circuit breaker implementation, the problem can be mostly solved.  Since the circuit breaker will return a failed future after a timeout you specify, you can send an already constructed Promise to the actor and give the circuit breaker the result of Promise.future.  Since the circuit breaker does not have access to the promise you constructed, you should have no problems with a race to write a result to it on low timeouts and/or slow actors (see the <a href="https://github.com/j14159/akka-jdbc-post">example project</a> for this method).</p></li>
+<li><p>It should be fairly obvious that with complex problem domains and a lot of models the actor and thus connection count can get high.  When this occurs, you already have an interface that looks like a service and provides reasonable support for failure handling.  Move larger and/or high-traffic aggregate roots out of the application into actual separate services, swapping out the functionality behind the Future-based API without changing the interface.  The only difference to callers should be at most some different exception classes on failure and completion times.</p>
+
+<p>While I think externalizing services like this is generally a great idea, exercise caution.  Move <a href="http://martinfowler.com/bliki/BoundedContext.html">bounded contexts</a> out first and don&rsquo;t forget that when you move to an external service, you add a set of latencies in serialization, deserialization, and additional network traffic.  Ensure that you both <em>measure</em> and account for this.</p></li>
+<li>Connections are hidden so the functionality provided by your DAO actors must be complete (no arbitrary SQL).  You can get around this by building an actor that takes closures or something along those lines as transaction blocks.  See <a href="https://github.com/nkallen/querulous">Querolous</a> for this sort of idea but I think this is missing the point in the context of this particular discussion.</li>
+<li>Transactions that span multiple aggregate roots are essentially impossible in any <em>traditional</em> sense (those that are handled entirely inside the database), as they also are in most honest distributed system designs.  People like <a href="http://www.ics.uci.edu/~cs223/papers/cidr07p15.pdf">Pat Helland</a> and <a href="http://www.bailis.org/">Peter Bailis</a> amongst many others are doing very interesting work in this area (apologies to the many deserving people I&rsquo;ve left out here, too many to name).</li>
+<li>Timeouts are not guaranteed to trigger failure exactly when you want them to (it may take longer).</li>
+<li>The router + actor approach introduces aspects of queue growth as described above so there is an obvious need for back pressure and capacity planning.  Circuit breakers help mitigate this but they&rsquo;re not a silver bullet.</li>
+<li>Boilerplate.</li>
+</ul>
+
+
+<h1>The Immediate Benefits</h1>
+
+<p>There are three particular benefits for any system, especially if done in the early stages of its life:</p>
+
+<ul>
+<li>APIs that are asynchronous, composable, and failure-centric.</li>
+<li>Easily configurable parallelism and limits.</li>
+<li>Comprehensible subcomponents (the most important benefit of service oriented architectures whether micro or otherwise).</li>
+</ul>
+
+
+<p>At present I think the above strengths combined with the relative ease of partitioning a system into other more granular services later on (not to mention CQRS and event sourcing) make this a reasonable approach to designing a system.  While I&rsquo;m not 100% happy with the boilerplate feeling I get at times, the concrete isolation of the models into their initially internal services has definitely helped me already to keep things clean and understandable.  Having said that, it is far from lost on me how much less code it takes to do the same thing in Erlang with the caveat that I have yet to see something comparable to futures in for-comprehensions there (please correct me if I&rsquo;m missing something like this!).  If you missed the two links above, my example project using the send-in-promises approach is <a href="https://github.com/j14159/akka-jdbc-post">available here</a>.</p>
+
+<p>Thanks to <a href="https://twitter.com/saemg">Saem</a> and <a href="https://twitter.com/eddsteel">Ed</a> for proof reading and pointing out where more clarity was necessary.  Comments, criticism and general dicussion welcome in comments or on <a href="https://twitter.com/j14159">Twitter</a>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[eSpacewar Open Sourced]]></title>
