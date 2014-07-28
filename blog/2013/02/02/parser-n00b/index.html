@@ -130,38 +130,7 @@
 <p>The upshot of everything I said above is that we needed a basic routing DSL/library on top of Netty.  Since we need to provide both static and dynamic paths, it seemed natural to start looking at combinatorial parsers (if you&rsquo;re curious, go read <a href="http://www.codecommit.com/blog/scala/the-magic-behind-parser-combinators">this post</a> by <a href="https://twitter.com/djspiewak">Daniel Spiewak</a>).  After some initial fumbling with regex and possible path parsers, I decided to see what I could do with S-expressions.  This was the initial result:</p>
 
 <div><script src='https://gist.github.com/4424770.js'></script>
-<noscript><pre><code>import scala.util.parsing.combinator._
-
-sealed trait Term
-
-case class Number(v: Double) extends Term
-case class Id(v: String) extends Term
-case class SExp(terms: List[Term]) extends Term
-
-object SExpParser extends RegexParsers {
-  def number: Parser[Number] = &quot;&quot;&quot;\d+(\.\d+)?&quot;&quot;&quot;.r ^^ { d =&gt; Number(d.toDouble) }
-  def id: Parser[Id] = &quot;&quot;&quot;[a-zA-Z\*\/\+\-&lt;&gt;=?!]+[a-zA-Z\*\/\+\-&lt;&gt;=0-9?!]*&quot;&quot;&quot;.r ^^ { i =&gt; Id(i) }
-  def sexp: Parser[SExp] = &quot;(&quot; ~&gt; rep(number | id | sexp) &lt;~ &quot;)&quot; ^^ { l =&gt; SExp(l) }
-
-  def tryIt(expression: String) = parseAll(sexp, expression)
-}
-
-object Example {
-  def succeeds() = {
-    val examples = List(
-      &quot;(&gt; 0 9)&quot;,
-      &quot;(define (aFunction x y) (+ x y))&quot;,
-      &quot;(?test a 2)&quot;,
-      &quot;(some! (slightly? 0 (+ nested (stuff (* to (test 0))))))&quot;)
-
-    examples map SExpParser.tryIt
-  }
-
-  def fails() = {
-    SExpParser.tryIt(&quot;(unmatched (parens)&quot;)
-  }
-}
-</code></pre></noscript></div>
+<noscript><pre><code></code></pre></noscript></div>
 
 
 <p>Once I had progressed a bit further, it seemed natural to see how easily I could add simple evaluation of basic math operators (+, &ndash;, / and *).</p>
@@ -177,17 +146,7 @@ object Example {
 <p>Here&rsquo;s a very simple example of what Floor lets you do:</p>
 
 <div><script src='https://gist.github.com/4699916.js'></script>
-<noscript><pre><code>&quot;/hello/:name&quot; get {
-  request =&gt; Future {
-    /*
-    * we're in The Future here so you can do 
-    * heavier stuff without blocking up other
-    * things like the Netty handler.
-    */
-    val name = request.path(&quot;:name&quot;)
-    Response.ok(s&quot;Hello, ${name}&quot;)
-  }
-}</code></pre></noscript></div>
+<noscript><pre><code></code></pre></noscript></div>
 
 
 <p>There&rsquo;s a bit more to it than that but I&rsquo;m sure you get the idea.</p>
