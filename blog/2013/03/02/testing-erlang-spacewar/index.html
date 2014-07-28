@@ -1,0 +1,357 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Testing Erlang Spacewar - NoisyCode</title>
+  <meta name="author" content="Jeremy Pierre">
+
+  
+  <meta name="description" content="What&#8217;s Erlang Spacewar? A multiplayer version of Spacewar! built in Erlang with Cowboy using websockets. For the moment, it&#8217;s quite basic &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://j14159.github.com/blog/2013/03/02/testing-erlang-spacewar/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="NoisyCode" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-35745774-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">NoisyCode</a></h1>
+  
+    <h2>f(x) -> ~dac</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:j14159.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/about">About</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Testing Erlang Spacewar</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-03-02T15:31:00-08:00" pubdate data-updated="true">Mar 2<span>nd</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h2>What&#8217;s Erlang Spacewar?</h2>
+
+<p>A multiplayer version of <a href="http://en.wikipedia.org/wiki/Spacewar!">Spacewar!</a> built in <a href="http://erlang.org">Erlang</a> with <a href="https://github.com/extend/cowboy">Cowboy</a> using websockets.  For the moment, it&#8217;s quite basic and really intended to be a proof-of-concept.  The idea was to see if it is even <em>possible</em> to use websockets for this sort of thing.</p>
+
+<p>Right now I&#8217;m just trying to get a sense of how it performs on a tiny little EC2 VM so I&#8217;d be most grateful if you could grab a couple friends and jump in when you have a few minutes to spare.  Fair warning:  I fully expect it to fall over and die if there are more than 50 or so people in there but I guess we&#8217;ll find out.</p>
+
+<p>I&#8217;ll give you the link to play, don&#8217;t worry, just a couple quick things&#8230;</p>
+
+<h2>How Long Will It Work For?</h2>
+
+<p>I&#8217;m going to keep it live (aside from crashes, etc) for at least a couple of weeks I think.</p>
+
+<h2>What You Need:</h2>
+
+<p>A browser that supports websockets and HTML canvas.  Think recent versions of Chrome and Firefox, Safari <em>should</em> work.</p>
+
+<h2>Problems You Can Expect</h2>
+
+<h3>It&#8217;s Ugly</h3>
+
+<p>And I know.  No explosions yet, very minimal.</p>
+
+<h3>It&#8217;s Choppy Sometimes</h3>
+
+<p>It&#8217;s running on a t1.micro in Amazon EC2&#8217;s us-east-1 region.</p>
+
+<p><strong>Translation</strong>:  it&#8217;s got less than a full CPU core (really just uses spare cycles from other bigger VMs) and it&#8217;s in Virginia so if you&#8217;re on the West coast like me, expect some lag.</p>
+
+<h3>Crashes/Termination</h3>
+
+<p>I&#8217;ll be messing with the code for the next week so do expect unavailability due to upgrades and crashes.</p>
+
+<h2>Please Do</h2>
+
+<h3>Play it and tell me what you think</h3>
+
+<p>I know about choppiness and ugliness but if you find any other frustrating bits (or even stuff you love), please do tell me in the comments or on <a href="http://twitter.com/j14159">Twitter</a>.</p>
+
+<h3>Share the link</h3>
+
+<p>But please share the link to this blog post - I&#8217;d like to give all test players the same warnings/notes I&#8217;m giving you.</p>
+
+<h2>Are You Going To Release The Source?</h2>
+
+<p>Yes.  It&#8217;ll be reasonably open (probably BSD or MIT license) on my <a href="https://github.com/j14159">github account</a> within a couple of weeks.  I&#8217;m still cleaning things up and moving to gen_server/proper OTP instead of bare Erlang processes.</p>
+
+<p>For the record, the repository will contain the grim history of almost all my mistakes.  It&#8217;s been a learning experience.</p>
+
+<h1>Shut Up And Let Me Play!</h1>
+
+<p>Of course.  Here&#8217;s the game, don&#8217;t forget to enter a username and click &#8220;Start Playing&#8221;:  <a href="http://esw.noisycode.com:8080/sw.html">Erlang Websocket Spacewar!</a></p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Jeremy Pierre</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-03-02T15:31:00-08:00" pubdate data-updated="true">Mar 2<span>nd</span>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/erlang/'>erlang</a>, <a class='category' href='/blog/categories/spacewar/'>spacewar</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://j14159.github.com/blog/2013/03/02/testing-erlang-spacewar/" data-via="j14159" data-counturl="http://j14159.github.com/blog/2013/03/02/testing-erlang-spacewar/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/02/02/parser-n00b/" title="Previous Post: Parser N00b">&laquo; Parser N00b</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2013/03/09/espacewar-open-sourced/" title="Next Post: eSpacewar Open Sourced">eSpacewar Open Sourced &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/03/09/espacewar-open-sourced/">eSpacewar Open Sourced</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/03/02/testing-erlang-spacewar/">Testing Erlang Spacewar</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/02/02/parser-n00b/">Parser N00b</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/23/posterity-00-ia32-memory-management/">Posterity 00:  IA32 Memory Management</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/21/pawnshop-in-which-i-learn-erlang-and-clojure-for-some-good/">Learning Erlang + Clojure For Some Good</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/j14159">@j14159</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'j14159',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("j14159", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/j14159" class="twitter-follow-button" data-show-count="false">Follow @j14159</a>
+  
+</section>
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/113367554135338391023?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Jeremy Pierre -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'noisycode';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://j14159.github.com/blog/2013/03/02/testing-erlang-spacewar/';
+        var disqus_url = 'http://j14159.github.com/blog/2013/03/02/testing-erlang-spacewar/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

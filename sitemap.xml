@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
+    <url>
+        <loc>
+            http://j14159.github.com/blog/2012/10/21/pawnshop-in-which-i-learn-erlang-and-clojure-for-some-good/
+        </loc>
+        <lastmod>2013-02-02T15:47:40-08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://j14159.github.com/blog/2012/10/23/posterity-00-ia32-memory-management/</loc>
+        <lastmod>2013-02-02T15:47:40-08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://j14159.github.com/blog/2013/02/02/parser-n00b/</loc>
+        <lastmod>2013-02-02T18:26:06-08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://j14159.github.com/blog/2013/03/02/testing-erlang-spacewar/</loc>
+        <lastmod>2013-03-09T09:36:44-08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://j14159.github.com/blog/2013/03/09/espacewar-open-sourced/</loc>
+        <lastmod>2013-03-09T10:22:18-08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://j14159.github.com/about/</loc>
+        <lastmod>2013-02-02T15:47:40-08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://j14159.github.com/blog/archives/</loc>
+        <lastmod>2013-03-09T10:22:18-08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://j14159.github.com/</loc>
+        <lastmod>2013-03-09T10:22:18-08:00</lastmod>
+    </url>
+</urlset>
