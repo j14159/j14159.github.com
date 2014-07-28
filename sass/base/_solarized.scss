@@ -15,7 +15,7 @@ $solar-blue:      #268bd2 !default;
 $solar-cyan:      #2aa198 !default;
 $solar-green:     #859900 !default;
 
-$solarized: light !default;
+$solarized: dark !default;
 
 @if $solarized == light {
 
@@ -25,8 +25,8 @@ $solarized: light !default;
   $_base00: $base00;
   $_base0:  $base0;
   $_base1:  $base1;
-  $_base2:  #eeeeee; //$base2;
-  $_base3:  #eeeeee; //$base3;
+  $_base2:  $base2;
+  $_base3:  $base3;
 
   $base03:  $_base3;
   $base02:  $_base2;
