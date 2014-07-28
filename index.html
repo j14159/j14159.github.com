@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
 <!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
@@ -17,13 +18,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://j14159.github.com/">
+  <link rel="canonical" href="http://noisycode.com">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="/javascripts/ender.js"></script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="NoisyCode" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
 <link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
@@ -60,7 +62,7 @@
   
 <form action="http://google.com/search" method="get">
   <fieldset role="search">
-    <input type="hidden" name="q" value="site:j14159.github.com" />
+    <input type="hidden" name="q" value="site:noisycode.com" />
     <input class="search" type="text" name="q" results="0" placeholder="Search"/>
   </fieldset>
 </form>
@@ -98,7 +100,7 @@
   
 
 
-<time datetime="2013-03-09T09:13:00-08:00" pubdate data-updated="true">Mar 9<span>th</span>, 2013</time>
+<time datetime="2013-03-09T09:13:00-08:00" pubdate data-updated="true">Mar 9<sup>th</sup>, 2013</time>
         
       </p>
     
@@ -131,36 +133,36 @@
 
 <h3>Learning Erlang</h3>
 
-<p>Aside from my (so-far) abortive attempt to build a <a href="https://github.com/j14159/PawnShop">URL-shortener</a>, I haven&#8217;t found an excuse to really dig into Erlang yet.  At the same time, I have been thinking for a while about the possibility of simple games via websockets.  The concurrency and responsiveness requirements for something like this make Erlang a natural choice.</p>
+<p>Aside from my (so-far) abortive attempt to build a <a href="https://github.com/j14159/PawnShop">URL-shortener</a>, I haven&rsquo;t found an excuse to really dig into Erlang yet.  At the same time, I have been thinking for a while about the possibility of simple games via websockets.  The concurrency and responsiveness requirements for something like this make Erlang a natural choice.</p>
 
 <h3>More With Websockets</h3>
 
-<p>They&#8217;re still sort of stuck in standards-hell and probably not as good as they could be but I wanted to try them out in more depth.  I didn&#8217;t consider comet for this because the nature of Spacewar requires a lot of small, rapid updates and I <em>suspected</em> (but cannot yet confirm) that the repeated connection setup overhead <em>might</em> negatively impact this.</p>
+<p>They&rsquo;re still sort of stuck in standards-hell and probably not as good as they could be but I wanted to try them out in more depth.  I didn&rsquo;t consider comet for this because the nature of Spacewar requires a lot of small, rapid updates and I <em>suspected</em> (but cannot yet confirm) that the repeated connection setup overhead <em>might</em> negatively impact this.</p>
 
-<p><strong>In actual fact</strong>, my assumption/suspicion is extremely likely to be <strong>totally wrong</strong> for the scope of this project.  It probably only makes a difference at an extremely high rate of messages (eSpacewar does a minimum of 20/second to each client) which I&#8217;m obviously not dealing with here.</p>
+<p><strong>In actual fact</strong>, my assumption/suspicion is extremely likely to be <strong>totally wrong</strong> for the scope of this project.  It probably only makes a difference at an extremely high rate of messages (eSpacewar does a minimum of 20/second to each client) which I&rsquo;m obviously not dealing with here.</p>
 
 <h3>Derp Cloud Derp</h3>
 
-<p>This one&#8217;s easy.  I just wanted to see if a tiny EC2 node could actually handle it.  It mostly can but the t1.micro it&#8217;s hosted on now tends to stutter occassionally.</p>
+<p>This one&rsquo;s easy.  I just wanted to see if a tiny EC2 node could actually handle it.  It mostly can but the t1.micro it&rsquo;s hosted on now tends to stutter occassionally.</p>
 
 <h2>What I Liked</h2>
 
 <h3>Erlang</h3>
 
-<p>I could probably go on forever about this (but won&#8217;t here).  A few specific points that I ended up really loving:</p>
+<p>I could probably go on forever about this (but won&rsquo;t here).  A few specific points that I ended up really loving:</p>
 
 <ul>
 <li>Pattern matching permeates <em>everything</em> to the point that if/then/else just seems medieval.</li>
-<li>So easy to avoid shared state.  You just don&#8217;t have any option (slight lie, go with it) so it makes things easier to keep clean.</li>
-<li>Clean, simple and minimal.  The core is so small and the emphasis on recursion so high that you&#8217;re naturally pushed to composability (although you&#8217;ll likely find gross contradictions in my code).</li>
+<li>So easy to avoid shared state.  You just don&rsquo;t have any option (slight lie, go with it) so it makes things easier to keep clean.</li>
+<li>Clean, simple and minimal.  The core is so small and the emphasis on recursion so high that you&rsquo;re naturally pushed to composability (although you&rsquo;ll likely find gross contradictions in my code).</li>
 </ul>
 
 
-<p>I didn&#8217;t actually make much use of supervision so can&#8217;t comment on that yet (but love it in the Akka/Scala world).</p>
+<p>I didn&rsquo;t actually make much use of supervision so can&rsquo;t comment on that yet (but love it in the Akka/Scala world).</p>
 
 <h3>Turns Out People Like It</h3>
 
-<p>Who knew?  Simple gameplay, easy to drop in and low requirements.  I&#8217;ve seen some great 10 player moments of mayhem.  Would have liked to see more but I think it would make playing almost impossible due to the number of torpedoes flying around.</p>
+<p>Who knew?  Simple gameplay, easy to drop in and low requirements.  I&rsquo;ve seen some great 10 player moments of mayhem.  Would have liked to see more but I think it would make playing almost impossible due to the number of torpedoes flying around.</p>
 
 <h2>What I Screwed Up</h2>
 
@@ -168,13 +170,13 @@
 
 <h3>Unit Tests</h3>
 
-<p>There aren&#8217;t any.  I pretty much just slammed through this project to get things working and learn what I could.</p>
+<p>There aren&rsquo;t any.  I pretty much just slammed through this project to get things working and learn what I could.</p>
 
 <h3>Collision Detection</h3>
 
 <p>Collision detection occurs <em>after</em> an entity (torpedo, player) has been moved and is based on points in space.  This means that if players and/or torpedoes are moving quickly, they can appear to pass through each other.  This could be solved by using line segments to see if paths cross.</p>
 
-<p>A further issue is that the server side has no concept of the ship&#8217;s shape.  It considers a ship to be a point with a certain bounding area and only registers a collision if two entities overlap.</p>
+<p>A further issue is that the server side has no concept of the ship&rsquo;s shape.  It considers a ship to be a point with a certain bounding area and only registers a collision if two entities overlap.</p>
 
 <h3>handle_info</h3>
 
@@ -184,21 +186,21 @@
 
 <h3>Records</h3>
 
-<p>I ended up not using records (just haven&#8217;t looked closely at them yet) and used tuples everywhere.  I suspect I may have been able to simplify some state by using these but am unsure of how this would impact some of my pattern matching use.  I&#8217;m aware they&#8217;re an extension of tuples but don&#8217;t know if this enforces a certain structure.  An area for futher exploration.</p>
+<p>I ended up not using records (just haven&rsquo;t looked closely at them yet) and used tuples everywhere.  I suspect I may have been able to simplify some state by using these but am unsure of how this would impact some of my pattern matching use.  I&rsquo;m aware they&rsquo;re an extension of tuples but don&rsquo;t know if this enforces a certain structure.  An area for futher exploration.</p>
 
 <h3>Client</h3>
 
-<p>I&#8217;m clearly not an experienced JavaScript developer and need improvement (the playing space size is hard-coded, bad).  One of the areas I <em>wanted</em> to get into but didn&#8217;t is WebGL but I&#8217;ll leave that for later.</p>
+<p>I&rsquo;m clearly not an experienced JavaScript developer and need improvement (the playing space size is hard-coded, bad).  One of the areas I <em>wanted</em> to get into but didn&rsquo;t is WebGL but I&rsquo;ll leave that for later.</p>
 
 <h2>Conclusions</h2>
 
 <p>I put this into a repo at a fairly early state so you will be able to dig back and see the progression (it was much uglier before).</p>
 
-<p>As a result of this project, I&#8217;m confident enough with Erlang (and Cowboy) to start applying it to some more advanced/involved things so I&#8217;m going to push on with some new projects.  I&#8217;ll undoubtably be posting progress on those at some time soon.</p>
+<p>As a result of this project, I&rsquo;m confident enough with Erlang (and Cowboy) to start applying it to some more advanced/involved things so I&rsquo;m going to push on with some new projects.  I&rsquo;ll undoubtably be posting progress on those at some time soon.</p>
 
-<p>The problems above, unfortunately, likely won&#8217;t get fixed.  I&#8217;ve essentially learned what I set out to and eSpacewar has served well for that process.  Feel free to fork/host/modify, I&#8217;d appreciate a link to this blog if you decide to host it (or some derivative) somewhere else.</p>
+<p>The problems above, unfortunately, likely won&rsquo;t get fixed.  I&rsquo;ve essentially learned what I set out to and eSpacewar has served well for that process.  Feel free to fork/host/modify, I&rsquo;d appreciate a link to this blog if you decide to host it (or some derivative) somewhere else.</p>
 
-<p>Comments/criticism most welcome on <a href="http://twitter.com/j14159">Twitter</a> and in the comments below.  I&#8217;ll consider pull requests on GitHub but don&#8217;t really want to mess with this too much further (feel free to fork and fix/extend).</p>
+<p>Comments/criticism most welcome on <a href="http://twitter.com/j14159">Twitter</a> and in the comments below.  I&rsquo;ll consider pull requests on GitHub but don&rsquo;t really want to mess with this too much further (feel free to fork and fix/extend).</p>
 </div>
   
   
@@ -227,24 +229,24 @@
   
 
 
-<time datetime="2013-03-02T15:31:00-08:00" pubdate data-updated="true">Mar 2<span>nd</span>, 2013</time>
+<time datetime="2013-03-02T15:31:00-08:00" pubdate data-updated="true">Mar 2<sup>nd</sup>, 2013</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><h2>What&#8217;s Erlang Spacewar?</h2>
+  <div class="entry-content"><h2>What&rsquo;s Erlang Spacewar?</h2>
 
-<p>A multiplayer version of <a href="http://en.wikipedia.org/wiki/Spacewar!">Spacewar!</a> built in <a href="http://erlang.org">Erlang</a> with <a href="https://github.com/extend/cowboy">Cowboy</a> using websockets.  For the moment, it&#8217;s quite basic and really intended to be a proof-of-concept.  The idea was to see if it is even <em>possible</em> to use websockets for this sort of thing.</p>
+<p>A multiplayer version of <a href="http://en.wikipedia.org/wiki/Spacewar!">Spacewar!</a> built in <a href="http://erlang.org">Erlang</a> with <a href="https://github.com/extend/cowboy">Cowboy</a> using websockets.  For the moment, it&rsquo;s quite basic and really intended to be a proof-of-concept.  The idea was to see if it is even <em>possible</em> to use websockets for this sort of thing.</p>
 
-<p>Right now I&#8217;m just trying to get a sense of how it performs on a tiny little EC2 VM so I&#8217;d be most grateful if you could grab a couple friends and jump in when you have a few minutes to spare.  Fair warning:  I fully expect it to fall over and die if there are more than 50 or so people in there but I guess we&#8217;ll find out.</p>
+<p>Right now I&rsquo;m just trying to get a sense of how it performs on a tiny little EC2 VM so I&rsquo;d be most grateful if you could grab a couple friends and jump in when you have a few minutes to spare.  Fair warning:  I fully expect it to fall over and die if there are more than 50 or so people in there but I guess we&rsquo;ll find out.</p>
 
-<p>I&#8217;ll give you the link to play, don&#8217;t worry, just a couple quick things&#8230;</p>
+<p>I&rsquo;ll give you the link to play, don&rsquo;t worry, just a couple quick things&hellip;</p>
 
 <h2>How Long Will It Work For?</h2>
 
-<p>I&#8217;m going to keep it live (aside from crashes, etc) for at least a couple of weeks I think.</p>
+<p>I&rsquo;m going to keep it live (aside from crashes, etc) for at least a couple of weeks I think.</p>
 
 <h2>What You Need:</h2>
 
@@ -252,19 +254,19 @@
 
 <h2>Problems You Can Expect</h2>
 
-<h3>It&#8217;s Ugly</h3>
+<h3>It&rsquo;s Ugly</h3>
 
 <p>And I know.  No explosions yet, very minimal.</p>
 
-<h3>It&#8217;s Choppy Sometimes</h3>
+<h3>It&rsquo;s Choppy Sometimes</h3>
 
-<p>It&#8217;s running on a t1.micro in Amazon EC2&#8217;s us-east-1 region.</p>
+<p>It&rsquo;s running on a t1.micro in Amazon EC2&rsquo;s us-east-1 region.</p>
 
-<p><strong>Translation</strong>:  it&#8217;s got less than a full CPU core (really just uses spare cycles from other bigger VMs) and it&#8217;s in Virginia so if you&#8217;re on the West coast like me, expect some lag.</p>
+<p><strong>Translation</strong>:  it&rsquo;s got less than a full CPU core (really just uses spare cycles from other bigger VMs) and it&rsquo;s in Virginia so if you&rsquo;re on the West coast like me, expect some lag.</p>
 
 <h3>Crashes/Termination</h3>
 
-<p>I&#8217;ll be messing with the code for the next week so do expect unavailability due to upgrades and crashes.</p>
+<p>I&rsquo;ll be messing with the code for the next week so do expect unavailability due to upgrades and crashes.</p>
 
 <h2>Please Do</h2>
 
@@ -274,17 +276,17 @@
 
 <h3>Share the link</h3>
 
-<p>But please share the link to this blog post - I&#8217;d like to give all test players the same warnings/notes I&#8217;m giving you.</p>
+<p>But please share the link to this blog post &ndash; I&rsquo;d like to give all test players the same warnings/notes I&rsquo;m giving you.</p>
 
 <h2>Are You Going To Release The Source?</h2>
 
-<p>Yes.  It&#8217;ll be reasonably open (probably BSD or MIT license) on my <a href="https://github.com/j14159">github account</a> within a couple of weeks.  I&#8217;m still cleaning things up and moving to gen_server/proper OTP instead of bare Erlang processes.</p>
+<p>Yes.  It&rsquo;ll be reasonably open (probably BSD or MIT license) on my <a href="https://github.com/j14159">github account</a> within a couple of weeks.  I&rsquo;m still cleaning things up and moving to gen_server/proper OTP instead of bare Erlang processes.</p>
 
-<p>For the record, the repository will contain the grim history of almost all my mistakes.  It&#8217;s been a learning experience.</p>
+<p>For the record, the repository will contain the grim history of almost all my mistakes.  It&rsquo;s been a learning experience.</p>
 
 <h1>Shut Up And Let Me Play!</h1>
 
-<p>Of course.  Here&#8217;s the game, don&#8217;t forget to enter a username and click &#8220;Start Playing&#8221;:  <a href="http://esw.noisycode.com:8080/sw.html">Erlang Websocket Spacewar!</a></p>
+<p>Of course.  Here&rsquo;s the game, don&rsquo;t forget to enter a username and click &ldquo;Start Playing&rdquo;:  <a href="http://esw.noisycode.com:8080/sw.html">Erlang Websocket Spacewar!</a></p>
 </div>
   
   
@@ -313,7 +315,7 @@
   
 
 
-<time datetime="2013-02-02T14:27:00-08:00" pubdate data-updated="true">Feb 2<span>nd</span>, 2013</time>
+<time datetime="2013-02-02T14:27:00-08:00" pubdate data-updated="true">Feb 2<sup>nd</sup>, 2013</time>
         
       </p>
     
@@ -326,26 +328,26 @@
 
 <h2>How Did It Come To This?</h2>
 
-<p>Some background first.  At my <a href="http://hootsuite.com">day job</a>, we&#8217;ve ended up writing a lot of boilerplate for REST endpoints with Netty (it&#8217;s relevant, I&#8217;ll get to the LISP bit soon).  While I don&#8217;t want to get into it too much as we&#8217;ll likely be open-sourcing the results, we didn&#8217;t go with bigger solutions (e.g. Jetty, Scalatra, Play) because when you do, you&#8217;re making one or more of the following trade-offs (at minimum) in favour of an easier API for writing HTTP stuff:</p>
+<p>Some background first.  At my <a href="http://hootsuite.com">day job</a>, we&rsquo;ve ended up writing a lot of boilerplate for REST endpoints with Netty (it&rsquo;s relevant, I&rsquo;ll get to the LISP bit soon).  While I don&rsquo;t want to get into it too much as we&rsquo;ll likely be open-sourcing the results, we didn&rsquo;t go with bigger solutions (e.g. Jetty, Scalatra, Play) because when you do, you&rsquo;re making one or more of the following trade-offs (at minimum) in favour of an easier API for writing HTTP stuff:</p>
 
 <ul>
 <li>lack of visibility into how concurrency is handled at all levels of your application</li>
-<li>much bigger artifacts to deploy (unless you&#8217;re a ProGuard ninja)</li>
-<li>dealing with someone else&#8217;s assumptions about how HTTP-involved code (not necessarily a full &#8220;web app&#8221;) should be written</li>
+<li>much bigger artifacts to deploy (unless you&rsquo;re a ProGuard ninja)</li>
+<li>dealing with someone else&rsquo;s assumptions about how HTTP-involved code (not necessarily a full &ldquo;web app&rdquo;) should be written</li>
 </ul>
 
 
-<p>That third point is fuel for a much longer post/many discussions well outside the scope of this one.  I&#8217;m happy to drink beer and yell about it with you if you&#8217;re ever in Vancouver.</p>
+<p>That third point is fuel for a much longer post/many discussions well outside the scope of this one.  I&rsquo;m happy to drink beer and yell about it with you if you&rsquo;re ever in Vancouver.</p>
 
-<p>To be clear:  the above points <strong>DO NOT MATTER</strong> if you&#8217;re writing something that&#8217;s going on decent hardware (big servers) and/or you&#8217;re only dealing with a few hundred concurrent connections with DB/cache/distributed communication involved (echo and static file servers are a completely different story).  Even that still depends greatly on the nature of your app and where you&#8217;re running it.  The first point can also be mitigated by diving into the source for whatever library/framework you select but that will only get you so far, especially if you&#8217;ve got a larger team.  We went the direction that we did because we need to deal with thousands of concurrent inbound connections per server with lots of DB and cache interactions on M1 medium through M1 large EC2 VMs. In this situation transparency and simple configurability at each layer of the application are necessities.</p>
+<p>To be clear:  the above points <strong>DO NOT MATTER</strong> if you&rsquo;re writing something that&rsquo;s going on decent hardware (big servers) and/or you&rsquo;re only dealing with a few hundred concurrent connections with DB/cache/distributed communication involved (echo and static file servers are a completely different story).  Even that still depends greatly on the nature of your app and where you&rsquo;re running it.  The first point can also be mitigated by diving into the source for whatever library/framework you select but that will only get you so far, especially if you&rsquo;ve got a larger team.  We went the direction that we did because we need to deal with thousands of concurrent inbound connections per server with lots of DB and cache interactions on M1 medium through M1 large EC2 VMs. In this situation transparency and simple configurability at each layer of the application are necessities.</p>
 
-<p>Just in case:  there are other reasons we didn&#8217;t go with Finatra but I&#8217;ve already gone on too long.</p>
+<p>Just in case:  there are other reasons we didn&rsquo;t go with Finatra but I&rsquo;ve already gone on too long.</p>
 
 <h3>Getting To The LISP Bit</h3>
 
-<p>The upshot of everything I said above is that we needed a basic routing DSL/library on top of Netty.  Since we need to provide both static and dynamic paths, it seemed natural to start looking at combinatorial parsers (if you&#8217;re curious, go read <a href="http://www.codecommit.com/blog/scala/the-magic-behind-parser-combinators">this post</a> by <a href="https://twitter.com/djspiewak">Daniel Spiewak</a>).  After some initial fumbling with regex and possible path parsers, I decided to see what I could do with S-expressions.  This was the initial result:</p>
+<p>The upshot of everything I said above is that we needed a basic routing DSL/library on top of Netty.  Since we need to provide both static and dynamic paths, it seemed natural to start looking at combinatorial parsers (if you&rsquo;re curious, go read <a href="http://www.codecommit.com/blog/scala/the-magic-behind-parser-combinators">this post</a> by <a href="https://twitter.com/djspiewak">Daniel Spiewak</a>).  After some initial fumbling with regex and possible path parsers, I decided to see what I could do with S-expressions.  This was the initial result:</p>
 
-<div><script src='https://gist.github.com/4424770.js?file='></script>
+<div><script src='https://gist.github.com/4424770.js'></script>
 <noscript><pre><code>import scala.util.parsing.combinator._
 
 sealed trait Term
@@ -380,7 +382,7 @@ object Example {
 </code></pre></noscript></div>
 
 
-<p>Once I had progressed a bit further, it seemed natural to see how easily I could add simple evaluation of basic math operators (+, -, / and *).</p>
+<p>Once I had progressed a bit further, it seemed natural to see how easily I could add simple evaluation of basic math operators (+, &ndash;, / and *).</p>
 
 <p>Short answer:  <em>easy</em></p>
 
@@ -388,11 +390,11 @@ object Example {
 
 <h2>A Slight Tangent</h2>
 
-<p>Before I get into what was good and bad about my first LISP implementation experience, it bears briefly demonstrating the way these experiments have resulted in a solution for the original problem:  we need a simple, transparent, configurable routing layer on top of Netty.  Our library &#8220;Floor&#8221; was built with a single goal in mind - ruthless minimalism while staying <a href="http://en.wikipedia.org/wiki/Don't_repeat_yourself">DRY</a>.</p>
+<p>Before I get into what was good and bad about my first LISP implementation experience, it bears briefly demonstrating the way these experiments have resulted in a solution for the original problem:  we need a simple, transparent, configurable routing layer on top of Netty.  Our library &ldquo;Floor&rdquo; was built with a single goal in mind &ndash; ruthless minimalism while staying <a href="http://en.wikipedia.org/wiki/Don't_repeat_yourself">DRY</a>.</p>
 
-<p>Here&#8217;s a very simple example of what Floor lets you do:</p>
+<p>Here&rsquo;s a very simple example of what Floor lets you do:</p>
 
-<div><script src='https://gist.github.com/4699916.js?file='></script>
+<div><script src='https://gist.github.com/4699916.js'></script>
 <noscript><pre><code>&quot;/hello/:name&quot; get {
   request =&gt; Future {
     /*
@@ -406,33 +408,33 @@ object Example {
 }</code></pre></noscript></div>
 
 
-<p>There&#8217;s a bit more to it than that but I&#8217;m sure you get the idea.</p>
+<p>There&rsquo;s a bit more to it than that but I&rsquo;m sure you get the idea.</p>
 
 <h2>The Good Stuff</h2>
 
-<p>I got to dig a bit further into a couple areas that I haven&#8217;t before and they&#8217;re worth mentioning.  If/when Floor goes open source, you&#8217;ll see a lot of the same stuff in it.</p>
+<p>I got to dig a bit further into a couple areas that I haven&rsquo;t before and they&rsquo;re worth mentioning.  If/when Floor goes open source, you&rsquo;ll see a lot of the same stuff in it.</p>
 
 <h3>Partial Functions and Pattern Matching</h3>
 
-<p>Looking at the various traits that are bolted onto the <a href="https://github.com/j14159/BadLisp">BadLisp</a> interpreter, you&#8217;ll see that pretty much everything is done via filtering lists of partial functions based on pattern matching.  Both special forms (like &#8220;if-then-else&#8221;) and the simple built-in functions (e.g. +, -, car) are implemented this way.  Check out <a href="https://github.com/j14159/BadLisp/blob/master/src/main/scala/com/noisycode/Conditionals.scala">Conditionals.scala</a> for a brief example.  I generally like this approach and for the most part find it clean but it <em>does</em> have some downsides which I&#8217;ll touch on shortly.</p>
+<p>Looking at the various traits that are bolted onto the <a href="https://github.com/j14159/BadLisp">BadLisp</a> interpreter, you&rsquo;ll see that pretty much everything is done via filtering lists of partial functions based on pattern matching.  Both special forms (like &ldquo;if-then-else&rdquo;) and the simple built-in functions (e.g. +, &ndash;, car) are implemented this way.  Check out <a href="https://github.com/j14159/BadLisp/blob/master/src/main/scala/com/noisycode/Conditionals.scala">Conditionals.scala</a> for a brief example.  I generally like this approach and for the most part find it clean but it <em>does</em> have some downsides which I&rsquo;ll touch on shortly.</p>
 
 <h3>Implicit Classes</h3>
 
-<p>New in Scala 2.10, I&#8217;m sure they&#8217;ll be as contentious as implicit defs and vals were before.  Regardless, I stuck one in for the <a href="https://github.com/j14159/BadLisp/blob/master/src/main/scala/com/noisycode/Comparisons.scala">Comparisons</a> trait.  I treat it a little bit like a type class in that it allows certain value-based methods to be used with classes <a href="https://github.com/j14159/BadLisp">BadLisp</a> considers to be concrete values.  I suspect based on some of the reading I&#8217;ve done that this is not precisely what is meant by type classes in Scala but I think it&#8217;s a step in the right direction for the moment.</p>
+<p>New in Scala 2.10, I&rsquo;m sure they&rsquo;ll be as contentious as implicit defs and vals were before.  Regardless, I stuck one in for the <a href="https://github.com/j14159/BadLisp/blob/master/src/main/scala/com/noisycode/Comparisons.scala">Comparisons</a> trait.  I treat it a little bit like a type class in that it allows certain value-based methods to be used with classes <a href="https://github.com/j14159/BadLisp">BadLisp</a> considers to be concrete values.  I suspect based on some of the reading I&rsquo;ve done that this is not precisely what is meant by type classes in Scala but I think it&rsquo;s a step in the right direction for the moment.</p>
 
 <h2>The Bad Stuff</h2>
 
 <h3>Not Enough Implicit Classes</h3>
 
-<p>Again, probably a contentious point.  I do get the feeling, however, that I could have simplified even more with judicious use of these.  It&#8217;s not something I&#8217;m going to go back and refactor for but something I&#8217;m going to keep top of mind for future stuff.  Please do weigh in via comments or <a href="http://twitter.com/j14159">Twitter</a> if you have strong feelings one way or the other about this though.</p>
+<p>Again, probably a contentious point.  I do get the feeling, however, that I could have simplified even more with judicious use of these.  It&rsquo;s not something I&rsquo;m going to go back and refactor for but something I&rsquo;m going to keep top of mind for future stuff.  Please do weigh in via comments or <a href="http://twitter.com/j14159">Twitter</a> if you have strong feelings one way or the other about this though.</p>
 
 <h3>Partial Functions and the Symbol Table</h3>
 
-<p>Because my symbol table is simply a big list of partial functions that I match against, it&#8217;s a bit clunky to look up or alias things in the case of higher order functions (I just wrapped this one up this morning).  I&#8217;m not especially proud of how functions and scope <a href="https://github.com/j14159/BadLisp/blob/master/src/main/scala/com/noisycode/Definitions.scala">are handled</a> at present but I think I&#8217;m going to leave well enough alone as I seriously doubt this is the last time I try to implement something like this.</p>
+<p>Because my symbol table is simply a big list of partial functions that I match against, it&rsquo;s a bit clunky to look up or alias things in the case of higher order functions (I just wrapped this one up this morning).  I&rsquo;m not especially proud of how functions and scope <a href="https://github.com/j14159/BadLisp/blob/master/src/main/scala/com/noisycode/Definitions.scala">are handled</a> at present but I think I&rsquo;m going to leave well enough alone as I seriously doubt this is the last time I try to implement something like this.</p>
 
 <h2>Next</h2>
 
-<p>I won&#8217;t be working on this particular interpreter further but am happy to talk about anything you find deficient and/or interesting on <a href="http://twitter.com/j14159">Twitter</a> or in the comments.  Next steps for me are getting back to <a href="https://github.com/j14159/PawnShop">PawnShop</a> and/or experimenting with some Actor and Disruptor implementations I think.</p>
+<p>I won&rsquo;t be working on this particular interpreter further but am happy to talk about anything you find deficient and/or interesting on <a href="http://twitter.com/j14159">Twitter</a> or in the comments.  Next steps for me are getting back to <a href="https://github.com/j14159/PawnShop">PawnShop</a> and/or experimenting with some Actor and Disruptor implementations I think.</p>
 </div>
   
   
@@ -461,7 +463,7 @@ object Example {
   
 
 
-<time datetime="2012-10-23T19:37:00-07:00" pubdate data-updated="true">Oct 23<span>rd</span>, 2012</time>
+<time datetime="2012-10-23T19:37:00-07:00" pubdate data-updated="true">Oct 23<sup>rd</sup>, 2012</time>
         
       </p>
     
@@ -475,7 +477,7 @@ object Example {
 <ul>
 <li>no mention of how caching figures in</li>
 <li>little to no talk of actually securing things</li>
-<li>it&#8217;s IA32, so kind of out of date (bear in mind this was 10 years ago)</li>
+<li>it&rsquo;s IA32, so kind of out of date (bear in mind this was 10 years ago)</li>
 </ul>
 
 
@@ -508,7 +510,7 @@ object Example {
   
 
 
-<time datetime="2012-10-21T17:22:00-07:00" pubdate data-updated="true">Oct 21<span>st</span>, 2012</time>
+<time datetime="2012-10-21T17:22:00-07:00" pubdate data-updated="true">Oct 21<sup>st</sup>, 2012</time>
         
       </p>
     
@@ -517,22 +519,22 @@ object Example {
 
   <div class="entry-content"><h2>Background</h2>
 
-<p>Since pretty much everything I do at my <a href="http://twitter.com/hootsuite">day job</a> involves Akka and Scala, Erlang&#8217;s been on my radar for quite a while.  Using RabbitMQ in current products and considering Riak to solve some nasty storage issues has of course heightened my interest in it as well.  Thanks to <a href="http://twitter.com/ujm">@ujm</a> and <a href="http://twitter.com/tavisrudd">@tavisrudd</a> I&#8217;ve also been hearing a lot about Clojure for the past year or so and it has (not so) mysteriously turned up in a few testing tools at the aforementioned day job due to <a href="http://twitter.com/ujm">@ujm</a>&#8217;s unbridled love for it.  As I&#8217;ve been trying to improve my own approach to and understanding of functional programming, it seemed both natural and frankly exciting to dive into something involving both.</p>
+<p>Since pretty much everything I do at my <a href="http://twitter.com/hootsuite">day job</a> involves Akka and Scala, Erlang&rsquo;s been on my radar for quite a while.  Using RabbitMQ in current products and considering Riak to solve some nasty storage issues has of course heightened my interest in it as well.  Thanks to <a href="http://twitter.com/ujm">@ujm</a> and <a href="http://twitter.com/tavisrudd">@tavisrudd</a> I&rsquo;ve also been hearing a lot about Clojure for the past year or so and it has (not so) mysteriously turned up in a few testing tools at the aforementioned day job due to <a href="http://twitter.com/ujm">@ujm</a>&rsquo;s unbridled love for it.  As I&rsquo;ve been trying to improve my own approach to and understanding of functional programming, it seemed both natural and frankly exciting to dive into something involving both.</p>
 
 <h2>The Pitfall</h2>
 
-<p>This brings up a minor pet peeve of mine:  while evaluating something new and interesting, people often come up with trivial example projects and in the past, I&#8217;ve been possibly more guilty than most.  This is something I want very much to avoid now.  The problems I&#8217;ve seen in myself with using something <em>too</em> trivial to evaluate and learn new things are:</p>
+<p>This brings up a minor pet peeve of mine:  while evaluating something new and interesting, people often come up with trivial example projects and in the past, I&rsquo;ve been possibly more guilty than most.  This is something I want very much to avoid now.  The problems I&rsquo;ve seen in myself with using something <em>too</em> trivial to evaluate and learn new things are:</p>
 
 <ul>
-<li>performance assumptions are never grounded in reality when your code doesn&#8217;t do anything realistic.  A perfect example is testing concurrent websocket connection limits that simply echo input (I did this with Play! 2.0 and I&#8217;ve seen some naive numbers from the node.js crowd mentioned lately as well).</li>
-<li>simple projects rarely expose some of the strange corners of a language or platform.  Anyone who has extensively used Scala&#8217;s implicits or made extensive use of futures and promises will understand this.</li>
-<li>most importantly overly trivial projects won&#8217;t expose your <strong>own</strong> weaknesses and misunderstandings early on.</li>
+<li>performance assumptions are never grounded in reality when your code doesn&rsquo;t do anything realistic.  A perfect example is testing concurrent websocket connection limits that simply echo input (I did this with Play! 2.0 and I&rsquo;ve seen some naive numbers from the node.js crowd mentioned lately as well).</li>
+<li>simple projects rarely expose some of the strange corners of a language or platform.  Anyone who has extensively used Scala&rsquo;s implicits or made extensive use of futures and promises will understand this.</li>
+<li>most importantly overly trivial projects won&rsquo;t expose your <strong>own</strong> weaknesses and misunderstandings early on.</li>
 </ul>
 
 
 <h2>Some Goals</h2>
 
-<p>Given the above, there are a few specific challenges I&#8217;m looking to work on with this project in both Erlang and Clojure:</p>
+<p>Given the above, there are a few specific challenges I&rsquo;m looking to work on with this project in both Erlang and Clojure:</p>
 
 <ul>
 <li>unique ID generation without a central locking resource.  I want to be able to establish total ordering without any central coordination.  <em>Loose</em> temporal ordering is a nice to have.</li>
@@ -546,16 +548,16 @@ object Example {
 <li>learn to use their build tools (Leiningen and Rebar)</li>
 <li>loosen my reliance on object orientation</li>
 <li>get more comfortable with dynamic typing (I tend to yell a lot about the supremacy of static typing).</li>
-<li>experiment with a heterogeneous solution.  I&#8217;ll be building the same thing in both languages so I think some interesting comparisons could arise with regard to things like deployment, configuration and performance.</li>
+<li>experiment with a heterogeneous solution.  I&rsquo;ll be building the same thing in both languages so I think some interesting comparisons could arise with regard to things like deployment, configuration and performance.</li>
 </ul>
 
 
-<p>Naturally I&#8217;m going to make a few rules for myself, the first and most important being that I&#8217;m not going to hide my mistakes.  When I change my mind or screw up, all the details will be in the commit history.  Second, the whole thing will be open source so that anyone will be able to see my pace, changes and progress in github at any time.
-Lastly, I&#8217;ll welcome feedback and optimization suggestions(with credit given where credit is due) but won&#8217;t accept pull requests or massive rewrites from anyone - this is mine to learn and mess up.</p>
+<p>Naturally I&rsquo;m going to make a few rules for myself, the first and most important being that I&rsquo;m not going to hide my mistakes.  When I change my mind or screw up, all the details will be in the commit history.  Second, the whole thing will be open source so that anyone will be able to see my pace, changes and progress in github at any time.
+Lastly, I&rsquo;ll welcome feedback and optimization suggestions(with credit given where credit is due) but won&rsquo;t accept pull requests or massive rewrites from anyone &ndash; this is mine to learn and mess up.</p>
 
 <h2>The Actual Project</h2>
 
-<p>I&#8217;m going to build a simple URL shortener and image hosting service called <a href="http://github.com/j14159/PawnShop">PawnShop</a> with the following basic features:</p>
+<p>I&rsquo;m going to build a simple URL shortener and image hosting service called <a href="http://github.com/j14159/PawnShop">PawnShop</a> with the following basic features:</p>
 
 <ul>
 <li>exchange a URL for a short hash</li>
@@ -563,7 +565,7 @@ Lastly, I&#8217;ll welcome feedback and optimization suggestions(with credit giv
 <li>upload an image (png/jpeg) in return for a short hash</li>
 <li>redirect HTTP requests for a URL hash to the original</li>
 <li>display the matching submitted image for a given requested hash</li>
-<li>track click stats for each hash generated.  I&#8217;ll store these at millisecond resolution.</li>
+<li>track click stats for each hash generated.  I&rsquo;ll store these at millisecond resolution.</li>
 <li>display hosted images inside a minimal template</li>
 <li>provide a REST API to retrieve click stats, likely report by one hour intervals at the smallest at first.</li>
 <li>basic authentication via email address and password</li>
@@ -582,15 +584,15 @@ Lastly, I&#8217;ll welcome feedback and optimization suggestions(with credit giv
 
 <ul>
 <li>This will be a single monolithic project, no interdependent services.</li>
-<li>It will be heterogeneous in that I want to be able to run the Erlang version side by side with the Clojure version in the same cluster, off the same database, behind the same load balancer and things should Just Work (TM).</li>
-<li>I&#8217;m going to use standard web frameworks, likely <a href="http://webnoir.org">Noir</a> and either <a href="http://chicagoboss.org">Chicago Boss</a> or <a href="http://nitrogenproject.com">Nitrogen</a></li>
-<li>The only data store I&#8217;ll be using is Riak.</li>
+<li>It will be heterogeneous in that I want to be able to run the Erlang version side by side with the Clojure version in the same cluster, off the same database, behind the same load balancer and things should Just Work &trade;.</li>
+<li>I&rsquo;m going to use standard web frameworks, likely <a href="http://webnoir.org">Noir</a> and either <a href="http://chicagoboss.org">Chicago Boss</a> or <a href="http://nitrogenproject.com">Nitrogen</a></li>
+<li>The only data store I&rsquo;ll be using is Riak.</li>
 </ul>
 
 
 <h2>Following Along</h2>
 
-<p>I&#8217;m going to aim for roughly a post-per-week here.  Blog posts related to PawnShop will essentially be a notebook/journal of my reasoning for certain decisions as well as both negative and positive experiences throughout the learning and development process.</p>
+<p>I&rsquo;m going to aim for roughly a post-per-week here.  Blog posts related to PawnShop will essentially be a notebook/journal of my reasoning for certain decisions as well as both negative and positive experiences throughout the learning and development process.</p>
 
 <p><a href="http://github.com/j14159/PawnShop"><strong>GitHub</strong></a></p>
 
@@ -598,14 +600,14 @@ Lastly, I&#8217;ll welcome feedback and optimization suggestions(with credit giv
 
 <h2>Riak and the Data Model</h2>
 
-<p>A while ago, <a href="http://twitter.com/jamesgolick">@jamesgolick</a> told me I wasn&#8217;t allowed to use Riak until I had read the famous Dynamo paper in its entirety.  He&#8217;s right, and you should <a href="http://s3.amazonaws.com/AllThingsDistributed/sosp/amazon-dynamo-sosp2007.pdf">read it too</a> if you haven&#8217;t yet.</p>
+<p>A while ago, <a href="http://twitter.com/jamesgolick">@jamesgolick</a> told me I wasn&rsquo;t allowed to use Riak until I had read the famous Dynamo paper in its entirety.  He&rsquo;s right, and you should <a href="http://s3.amazonaws.com/AllThingsDistributed/sosp/amazon-dynamo-sosp2007.pdf">read it too</a> if you haven&rsquo;t yet.</p>
 
 <p>A URL shortener model seems a great fit for an eventually consistent Dynamo-style store like Riak.</p>
 
 <ul>
 <li>To shorten URLs and host pictures, you want high consistency for DB writes meaning that when a user submits new data, you want the write to complete with reasonable certainty.</li>
-<li>To retrieve URLs, low read consistency (small quorum) is OK.  Since we&#8217;re not <strong>mutating</strong> URL and picture entries, we don&#8217;t have to worry about an update that might not have hit replicas yet.</li>
-<li>To add and retrieve click stats, low read and write consistency is fine.  Missing one or two clicks out of thousands for a single report isn&#8217;t the end of the world, we just want reasonable accuracy when the stats are requested and eventually high accuracy.  If it takes a few hours for this to happen, so be it.</li>
+<li>To retrieve URLs, low read consistency (small quorum) is OK.  Since we&rsquo;re not <strong>mutating</strong> URL and picture entries, we don&rsquo;t have to worry about an update that might not have hit replicas yet.</li>
+<li>To add and retrieve click stats, low read and write consistency is fine.  Missing one or two clicks out of thousands for a single report isn&rsquo;t the end of the world, we just want reasonable accuracy when the stats are requested and eventually high accuracy.  If it takes a few hours for this to happen, so be it.</li>
 </ul>
 
 
@@ -613,7 +615,7 @@ Lastly, I&#8217;ll welcome feedback and optimization suggestions(with credit giv
 
 <h3>statsd</h3>
 
-<p>Since I&#8217;m going to monitor the hell out of everything, I&#8217;ll assume something statsd-compatible is available wherever this project runs.  These days I don&#8217;t think this is really an option at all for any sort of sane environment.</p>
+<p>Since I&rsquo;m going to monitor the hell out of everything, I&rsquo;ll assume something statsd-compatible is available wherever this project runs.  These days I don&rsquo;t think this is really an option at all for any sort of sane environment.</p>
 
 <h2>Next Steps</h2>
 
@@ -661,11 +663,11 @@ Lastly, I&#8217;ll welcome feedback and optimization suggestions(with credit giv
       </li>
     
       <li class="post">
-        <a href="/blog/2012/10/23/posterity-00-ia32-memory-management/">Posterity 00:  IA32 Memory Management</a>
+        <a href="/blog/2012/10/23/posterity-00-ia32-memory-management/">Posterity 00: IA32 Memory Management</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2012/10/21/pawnshop-in-which-i-learn-erlang-and-clojure-for-some-good/">Learning Erlang + Clojure For Some Good</a>
+        <a href="/blog/2012/10/21/pawnshop-in-which-i-learn-erlang-and-clojure-for-some-good/">Learning Erlang + Clojure for Some Good</a>
       </li>
     
   </ul>
@@ -680,7 +682,7 @@ Lastly, I&#8217;ll welcome feedback and optimization suggestions(with credit giv
   <a href="https://github.com/j14159">@j14159</a> on GitHub
   
   <script type="text/javascript">
-    $.domReady(function(){
+    $(document).ready(function(){
         if (!window.jXHR){
             var jxhr = document.createElement('script');
             jxhr.type = 'text/javascript';
@@ -735,7 +737,7 @@ Lastly, I&#8217;ll welcome feedback and optimization suggestions(with credit giv
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2013 - Jeremy Pierre -
+  Copyright &copy; 2014 - Jeremy Pierre -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 
@@ -750,7 +752,7 @@ Lastly, I&#8217;ll welcome feedback and optimization suggestions(with credit giv
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
     }());
 </script>
@@ -766,7 +768,7 @@ Lastly, I&#8217;ll welcome feedback and optimization suggestions(with credit giv
       var twitterWidgets = document.createElement('script');
       twitterWidgets.type = 'text/javascript';
       twitterWidgets.async = true;
-      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
       document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
     })();
   </script>

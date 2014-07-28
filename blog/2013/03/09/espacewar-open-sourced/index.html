@@ -18,13 +18,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://j14159.github.com/blog/2013/03/09/espacewar-open-sourced/">
+  <link rel="canonical" href="http://noisycode.com/blog/2013/03/09/espacewar-open-sourced">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="/javascripts/ender.js"></script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="NoisyCode" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
 <link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
@@ -61,7 +62,7 @@
   
 <form action="http://google.com/search" method="get">
   <fieldset role="search">
-    <input type="hidden" name="q" value="site:j14159.github.com" />
+    <input type="hidden" name="q" value="site:noisycode.com" />
     <input class="search" type="text" name="q" results="0" placeholder="Search"/>
   </fieldset>
 </form>
@@ -96,7 +97,7 @@
   
 
 
-<time datetime="2013-03-09T09:13:00-08:00" pubdate data-updated="true">Mar 9<span>th</span>, 2013</time>
+<time datetime="2013-03-09T09:13:00-08:00" pubdate data-updated="true">Mar 9<sup>th</sup>, 2013</time>
         
       </p>
     
@@ -129,36 +130,36 @@
 
 <h3>Learning Erlang</h3>
 
-<p>Aside from my (so-far) abortive attempt to build a <a href="https://github.com/j14159/PawnShop">URL-shortener</a>, I haven&#8217;t found an excuse to really dig into Erlang yet.  At the same time, I have been thinking for a while about the possibility of simple games via websockets.  The concurrency and responsiveness requirements for something like this make Erlang a natural choice.</p>
+<p>Aside from my (so-far) abortive attempt to build a <a href="https://github.com/j14159/PawnShop">URL-shortener</a>, I haven&rsquo;t found an excuse to really dig into Erlang yet.  At the same time, I have been thinking for a while about the possibility of simple games via websockets.  The concurrency and responsiveness requirements for something like this make Erlang a natural choice.</p>
 
 <h3>More With Websockets</h3>
 
-<p>They&#8217;re still sort of stuck in standards-hell and probably not as good as they could be but I wanted to try them out in more depth.  I didn&#8217;t consider comet for this because the nature of Spacewar requires a lot of small, rapid updates and I <em>suspected</em> (but cannot yet confirm) that the repeated connection setup overhead <em>might</em> negatively impact this.</p>
+<p>They&rsquo;re still sort of stuck in standards-hell and probably not as good as they could be but I wanted to try them out in more depth.  I didn&rsquo;t consider comet for this because the nature of Spacewar requires a lot of small, rapid updates and I <em>suspected</em> (but cannot yet confirm) that the repeated connection setup overhead <em>might</em> negatively impact this.</p>
 
-<p><strong>In actual fact</strong>, my assumption/suspicion is extremely likely to be <strong>totally wrong</strong> for the scope of this project.  It probably only makes a difference at an extremely high rate of messages (eSpacewar does a minimum of 20/second to each client) which I&#8217;m obviously not dealing with here.</p>
+<p><strong>In actual fact</strong>, my assumption/suspicion is extremely likely to be <strong>totally wrong</strong> for the scope of this project.  It probably only makes a difference at an extremely high rate of messages (eSpacewar does a minimum of 20/second to each client) which I&rsquo;m obviously not dealing with here.</p>
 
 <h3>Derp Cloud Derp</h3>
 
-<p>This one&#8217;s easy.  I just wanted to see if a tiny EC2 node could actually handle it.  It mostly can but the t1.micro it&#8217;s hosted on now tends to stutter occassionally.</p>
+<p>This one&rsquo;s easy.  I just wanted to see if a tiny EC2 node could actually handle it.  It mostly can but the t1.micro it&rsquo;s hosted on now tends to stutter occassionally.</p>
 
 <h2>What I Liked</h2>
 
 <h3>Erlang</h3>
 
-<p>I could probably go on forever about this (but won&#8217;t here).  A few specific points that I ended up really loving:</p>
+<p>I could probably go on forever about this (but won&rsquo;t here).  A few specific points that I ended up really loving:</p>
 
 <ul>
 <li>Pattern matching permeates <em>everything</em> to the point that if/then/else just seems medieval.</li>
-<li>So easy to avoid shared state.  You just don&#8217;t have any option (slight lie, go with it) so it makes things easier to keep clean.</li>
-<li>Clean, simple and minimal.  The core is so small and the emphasis on recursion so high that you&#8217;re naturally pushed to composability (although you&#8217;ll likely find gross contradictions in my code).</li>
+<li>So easy to avoid shared state.  You just don&rsquo;t have any option (slight lie, go with it) so it makes things easier to keep clean.</li>
+<li>Clean, simple and minimal.  The core is so small and the emphasis on recursion so high that you&rsquo;re naturally pushed to composability (although you&rsquo;ll likely find gross contradictions in my code).</li>
 </ul>
 
 
-<p>I didn&#8217;t actually make much use of supervision so can&#8217;t comment on that yet (but love it in the Akka/Scala world).</p>
+<p>I didn&rsquo;t actually make much use of supervision so can&rsquo;t comment on that yet (but love it in the Akka/Scala world).</p>
 
 <h3>Turns Out People Like It</h3>
 
-<p>Who knew?  Simple gameplay, easy to drop in and low requirements.  I&#8217;ve seen some great 10 player moments of mayhem.  Would have liked to see more but I think it would make playing almost impossible due to the number of torpedoes flying around.</p>
+<p>Who knew?  Simple gameplay, easy to drop in and low requirements.  I&rsquo;ve seen some great 10 player moments of mayhem.  Would have liked to see more but I think it would make playing almost impossible due to the number of torpedoes flying around.</p>
 
 <h2>What I Screwed Up</h2>
 
@@ -166,13 +167,13 @@
 
 <h3>Unit Tests</h3>
 
-<p>There aren&#8217;t any.  I pretty much just slammed through this project to get things working and learn what I could.</p>
+<p>There aren&rsquo;t any.  I pretty much just slammed through this project to get things working and learn what I could.</p>
 
 <h3>Collision Detection</h3>
 
 <p>Collision detection occurs <em>after</em> an entity (torpedo, player) has been moved and is based on points in space.  This means that if players and/or torpedoes are moving quickly, they can appear to pass through each other.  This could be solved by using line segments to see if paths cross.</p>
 
-<p>A further issue is that the server side has no concept of the ship&#8217;s shape.  It considers a ship to be a point with a certain bounding area and only registers a collision if two entities overlap.</p>
+<p>A further issue is that the server side has no concept of the ship&rsquo;s shape.  It considers a ship to be a point with a certain bounding area and only registers a collision if two entities overlap.</p>
 
 <h3>handle_info</h3>
 
@@ -182,21 +183,21 @@
 
 <h3>Records</h3>
 
-<p>I ended up not using records (just haven&#8217;t looked closely at them yet) and used tuples everywhere.  I suspect I may have been able to simplify some state by using these but am unsure of how this would impact some of my pattern matching use.  I&#8217;m aware they&#8217;re an extension of tuples but don&#8217;t know if this enforces a certain structure.  An area for futher exploration.</p>
+<p>I ended up not using records (just haven&rsquo;t looked closely at them yet) and used tuples everywhere.  I suspect I may have been able to simplify some state by using these but am unsure of how this would impact some of my pattern matching use.  I&rsquo;m aware they&rsquo;re an extension of tuples but don&rsquo;t know if this enforces a certain structure.  An area for futher exploration.</p>
 
 <h3>Client</h3>
 
-<p>I&#8217;m clearly not an experienced JavaScript developer and need improvement (the playing space size is hard-coded, bad).  One of the areas I <em>wanted</em> to get into but didn&#8217;t is WebGL but I&#8217;ll leave that for later.</p>
+<p>I&rsquo;m clearly not an experienced JavaScript developer and need improvement (the playing space size is hard-coded, bad).  One of the areas I <em>wanted</em> to get into but didn&rsquo;t is WebGL but I&rsquo;ll leave that for later.</p>
 
 <h2>Conclusions</h2>
 
 <p>I put this into a repo at a fairly early state so you will be able to dig back and see the progression (it was much uglier before).</p>
 
-<p>As a result of this project, I&#8217;m confident enough with Erlang (and Cowboy) to start applying it to some more advanced/involved things so I&#8217;m going to push on with some new projects.  I&#8217;ll undoubtably be posting progress on those at some time soon.</p>
+<p>As a result of this project, I&rsquo;m confident enough with Erlang (and Cowboy) to start applying it to some more advanced/involved things so I&rsquo;m going to push on with some new projects.  I&rsquo;ll undoubtably be posting progress on those at some time soon.</p>
 
-<p>The problems above, unfortunately, likely won&#8217;t get fixed.  I&#8217;ve essentially learned what I set out to and eSpacewar has served well for that process.  Feel free to fork/host/modify, I&#8217;d appreciate a link to this blog if you decide to host it (or some derivative) somewhere else.</p>
+<p>The problems above, unfortunately, likely won&rsquo;t get fixed.  I&rsquo;ve essentially learned what I set out to and eSpacewar has served well for that process.  Feel free to fork/host/modify, I&rsquo;d appreciate a link to this blog if you decide to host it (or some derivative) somewhere else.</p>
 
-<p>Comments/criticism most welcome on <a href="http://twitter.com/j14159">Twitter</a> and in the comments below.  I&#8217;ll consider pull requests on GitHub but don&#8217;t really want to mess with this too much further (feel free to fork and fix/extend).</p>
+<p>Comments/criticism most welcome on <a href="http://twitter.com/j14159">Twitter</a> and in the comments below.  I&rsquo;ll consider pull requests on GitHub but don&rsquo;t really want to mess with this too much further (feel free to fork and fix/extend).</p>
 </div>
 
 
@@ -219,7 +220,7 @@
   
 
 
-<time datetime="2013-03-09T09:13:00-08:00" pubdate data-updated="true">Mar 9<span>th</span>, 2013</time>
+<time datetime="2013-03-09T09:13:00-08:00" pubdate data-updated="true">Mar 9<sup>th</sup>, 2013</time>
       
 
 <span class="categories">
@@ -233,7 +234,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://j14159.github.com/blog/2013/03/09/espacewar-open-sourced/" data-via="j14159" data-counturl="http://j14159.github.com/blog/2013/03/09/espacewar-open-sourced/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://noisycode.com/blog/2013/03/09/espacewar-open-sourced/" data-via="j14159" data-counturl="http://noisycode.com/blog/2013/03/09/espacewar-open-sourced/" >Tweet</a>
   
   
   
@@ -276,11 +277,11 @@
       </li>
     
       <li class="post">
-        <a href="/blog/2012/10/23/posterity-00-ia32-memory-management/">Posterity 00:  IA32 Memory Management</a>
+        <a href="/blog/2012/10/23/posterity-00-ia32-memory-management/">Posterity 00: IA32 Memory Management</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2012/10/21/pawnshop-in-which-i-learn-erlang-and-clojure-for-some-good/">Learning Erlang + Clojure For Some Good</a>
+        <a href="/blog/2012/10/21/pawnshop-in-which-i-learn-erlang-and-clojure-for-some-good/">Learning Erlang + Clojure for Some Good</a>
       </li>
     
   </ul>
@@ -295,7 +296,7 @@
   <a href="https://github.com/j14159">@j14159</a> on GitHub
   
   <script type="text/javascript">
-    $.domReady(function(){
+    $(document).ready(function(){
         if (!window.jXHR){
             var jxhr = document.createElement('script');
             jxhr.type = 'text/javascript';
@@ -351,7 +352,7 @@
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2013 - Jeremy Pierre -
+  Copyright &copy; 2014 - Jeremy Pierre -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 
@@ -363,13 +364,13 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://j14159.github.com/blog/2013/03/09/espacewar-open-sourced/';
-        var disqus_url = 'http://j14159.github.com/blog/2013/03/09/espacewar-open-sourced/';
+        var disqus_identifier = 'http://noisycode.com/blog/2013/03/09/espacewar-open-sourced/';
+        var disqus_url = 'http://noisycode.com/blog/2013/03/09/espacewar-open-sourced/';
         var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
     }());
 </script>
@@ -385,7 +386,7 @@
       var twitterWidgets = document.createElement('script');
       twitterWidgets.type = 'text/javascript';
       twitterWidgets.async = true;
-      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
       document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
     })();
   </script>

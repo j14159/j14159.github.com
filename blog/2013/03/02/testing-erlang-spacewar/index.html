@@ -9,7 +9,7 @@
   <meta name="author" content="Jeremy Pierre">
 
   
-  <meta name="description" content="What&#8217;s Erlang Spacewar? A multiplayer version of Spacewar! built in Erlang with Cowboy using websockets. For the moment, it&#8217;s quite basic &hellip;">
+  <meta name="description" content="What&rsquo;s Erlang Spacewar? A multiplayer version of Spacewar! built in Erlang with Cowboy using websockets. For the moment, it&rsquo;s quite basic &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,13 +18,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://j14159.github.com/blog/2013/03/02/testing-erlang-spacewar/">
+  <link rel="canonical" href="http://noisycode.com/blog/2013/03/02/testing-erlang-spacewar">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="/javascripts/ender.js"></script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="NoisyCode" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
 <link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
@@ -61,7 +62,7 @@
   
 <form action="http://google.com/search" method="get">
   <fieldset role="search">
-    <input type="hidden" name="q" value="site:j14159.github.com" />
+    <input type="hidden" name="q" value="site:noisycode.com" />
     <input class="search" type="text" name="q" results="0" placeholder="Search"/>
   </fieldset>
 </form>
@@ -96,24 +97,24 @@
   
 
 
-<time datetime="2013-03-02T15:31:00-08:00" pubdate data-updated="true">Mar 2<span>nd</span>, 2013</time>
+<time datetime="2013-03-02T15:31:00-08:00" pubdate data-updated="true">Mar 2<sup>nd</sup>, 2013</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><h2>What&#8217;s Erlang Spacewar?</h2>
+<div class="entry-content"><h2>What&rsquo;s Erlang Spacewar?</h2>
 
-<p>A multiplayer version of <a href="http://en.wikipedia.org/wiki/Spacewar!">Spacewar!</a> built in <a href="http://erlang.org">Erlang</a> with <a href="https://github.com/extend/cowboy">Cowboy</a> using websockets.  For the moment, it&#8217;s quite basic and really intended to be a proof-of-concept.  The idea was to see if it is even <em>possible</em> to use websockets for this sort of thing.</p>
+<p>A multiplayer version of <a href="http://en.wikipedia.org/wiki/Spacewar!">Spacewar!</a> built in <a href="http://erlang.org">Erlang</a> with <a href="https://github.com/extend/cowboy">Cowboy</a> using websockets.  For the moment, it&rsquo;s quite basic and really intended to be a proof-of-concept.  The idea was to see if it is even <em>possible</em> to use websockets for this sort of thing.</p>
 
-<p>Right now I&#8217;m just trying to get a sense of how it performs on a tiny little EC2 VM so I&#8217;d be most grateful if you could grab a couple friends and jump in when you have a few minutes to spare.  Fair warning:  I fully expect it to fall over and die if there are more than 50 or so people in there but I guess we&#8217;ll find out.</p>
+<p>Right now I&rsquo;m just trying to get a sense of how it performs on a tiny little EC2 VM so I&rsquo;d be most grateful if you could grab a couple friends and jump in when you have a few minutes to spare.  Fair warning:  I fully expect it to fall over and die if there are more than 50 or so people in there but I guess we&rsquo;ll find out.</p>
 
-<p>I&#8217;ll give you the link to play, don&#8217;t worry, just a couple quick things&#8230;</p>
+<p>I&rsquo;ll give you the link to play, don&rsquo;t worry, just a couple quick things&hellip;</p>
 
 <h2>How Long Will It Work For?</h2>
 
-<p>I&#8217;m going to keep it live (aside from crashes, etc) for at least a couple of weeks I think.</p>
+<p>I&rsquo;m going to keep it live (aside from crashes, etc) for at least a couple of weeks I think.</p>
 
 <h2>What You Need:</h2>
 
@@ -121,19 +122,19 @@
 
 <h2>Problems You Can Expect</h2>
 
-<h3>It&#8217;s Ugly</h3>
+<h3>It&rsquo;s Ugly</h3>
 
 <p>And I know.  No explosions yet, very minimal.</p>
 
-<h3>It&#8217;s Choppy Sometimes</h3>
+<h3>It&rsquo;s Choppy Sometimes</h3>
 
-<p>It&#8217;s running on a t1.micro in Amazon EC2&#8217;s us-east-1 region.</p>
+<p>It&rsquo;s running on a t1.micro in Amazon EC2&rsquo;s us-east-1 region.</p>
 
-<p><strong>Translation</strong>:  it&#8217;s got less than a full CPU core (really just uses spare cycles from other bigger VMs) and it&#8217;s in Virginia so if you&#8217;re on the West coast like me, expect some lag.</p>
+<p><strong>Translation</strong>:  it&rsquo;s got less than a full CPU core (really just uses spare cycles from other bigger VMs) and it&rsquo;s in Virginia so if you&rsquo;re on the West coast like me, expect some lag.</p>
 
 <h3>Crashes/Termination</h3>
 
-<p>I&#8217;ll be messing with the code for the next week so do expect unavailability due to upgrades and crashes.</p>
+<p>I&rsquo;ll be messing with the code for the next week so do expect unavailability due to upgrades and crashes.</p>
 
 <h2>Please Do</h2>
 
@@ -143,17 +144,17 @@
 
 <h3>Share the link</h3>
 
-<p>But please share the link to this blog post - I&#8217;d like to give all test players the same warnings/notes I&#8217;m giving you.</p>
+<p>But please share the link to this blog post &ndash; I&rsquo;d like to give all test players the same warnings/notes I&rsquo;m giving you.</p>
 
 <h2>Are You Going To Release The Source?</h2>
 
-<p>Yes.  It&#8217;ll be reasonably open (probably BSD or MIT license) on my <a href="https://github.com/j14159">github account</a> within a couple of weeks.  I&#8217;m still cleaning things up and moving to gen_server/proper OTP instead of bare Erlang processes.</p>
+<p>Yes.  It&rsquo;ll be reasonably open (probably BSD or MIT license) on my <a href="https://github.com/j14159">github account</a> within a couple of weeks.  I&rsquo;m still cleaning things up and moving to gen_server/proper OTP instead of bare Erlang processes.</p>
 
-<p>For the record, the repository will contain the grim history of almost all my mistakes.  It&#8217;s been a learning experience.</p>
+<p>For the record, the repository will contain the grim history of almost all my mistakes.  It&rsquo;s been a learning experience.</p>
 
 <h1>Shut Up And Let Me Play!</h1>
 
-<p>Of course.  Here&#8217;s the game, don&#8217;t forget to enter a username and click &#8220;Start Playing&#8221;:  <a href="http://esw.noisycode.com:8080/sw.html">Erlang Websocket Spacewar!</a></p>
+<p>Of course.  Here&rsquo;s the game, don&rsquo;t forget to enter a username and click &ldquo;Start Playing&rdquo;:  <a href="http://esw.noisycode.com:8080/sw.html">Erlang Websocket Spacewar!</a></p>
 </div>
 
 
@@ -176,7 +177,7 @@
   
 
 
-<time datetime="2013-03-02T15:31:00-08:00" pubdate data-updated="true">Mar 2<span>nd</span>, 2013</time>
+<time datetime="2013-03-02T15:31:00-08:00" pubdate data-updated="true">Mar 2<sup>nd</sup>, 2013</time>
       
 
 <span class="categories">
@@ -190,7 +191,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://j14159.github.com/blog/2013/03/02/testing-erlang-spacewar/" data-via="j14159" data-counturl="http://j14159.github.com/blog/2013/03/02/testing-erlang-spacewar/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://noisycode.com/blog/2013/03/02/testing-erlang-spacewar/" data-via="j14159" data-counturl="http://noisycode.com/blog/2013/03/02/testing-erlang-spacewar/" >Tweet</a>
   
   
   
@@ -235,11 +236,11 @@
       </li>
     
       <li class="post">
-        <a href="/blog/2012/10/23/posterity-00-ia32-memory-management/">Posterity 00:  IA32 Memory Management</a>
+        <a href="/blog/2012/10/23/posterity-00-ia32-memory-management/">Posterity 00: IA32 Memory Management</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2012/10/21/pawnshop-in-which-i-learn-erlang-and-clojure-for-some-good/">Learning Erlang + Clojure For Some Good</a>
+        <a href="/blog/2012/10/21/pawnshop-in-which-i-learn-erlang-and-clojure-for-some-good/">Learning Erlang + Clojure for Some Good</a>
       </li>
     
   </ul>
@@ -254,7 +255,7 @@
   <a href="https://github.com/j14159">@j14159</a> on GitHub
   
   <script type="text/javascript">
-    $.domReady(function(){
+    $(document).ready(function(){
         if (!window.jXHR){
             var jxhr = document.createElement('script');
             jxhr.type = 'text/javascript';
@@ -310,7 +311,7 @@
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2013 - Jeremy Pierre -
+  Copyright &copy; 2014 - Jeremy Pierre -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 
@@ -322,13 +323,13 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://j14159.github.com/blog/2013/03/02/testing-erlang-spacewar/';
-        var disqus_url = 'http://j14159.github.com/blog/2013/03/02/testing-erlang-spacewar/';
+        var disqus_identifier = 'http://noisycode.com/blog/2013/03/02/testing-erlang-spacewar/';
+        var disqus_url = 'http://noisycode.com/blog/2013/03/02/testing-erlang-spacewar/';
         var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
     }());
 </script>
@@ -344,7 +345,7 @@
       var twitterWidgets = document.createElement('script');
       twitterWidgets.type = 'text/javascript';
       twitterWidgets.async = true;
-      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
       document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
     })();
   </script>

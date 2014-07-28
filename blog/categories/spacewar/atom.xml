@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: spacewar | NoisyCode]]></title>
-  <link href="http://j14159.github.com/blog/categories/spacewar/atom.xml" rel="self"/>
-  <link href="http://j14159.github.com/"/>
-  <updated>2013-03-09T10:44:36-08:00</updated>
-  <id>http://j14159.github.com/</id>
+  <link href="http://noisycode.com/blog/categories/spacewar/atom.xml" rel="self"/>
+  <link href="http://noisycode.com/"/>
+  <updated>2014-07-27T17:50:14-07:00</updated>
+  <id>http://noisycode.com/</id>
   <author>
     <name><![CDATA[Jeremy Pierre]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[eSpacewar Open Sourced]]></title>
-    <link href="http://j14159.github.com/blog/2013/03/09/espacewar-open-sourced/"/>
+    <link href="http://noisycode.com/blog/2013/03/09/espacewar-open-sourced/"/>
     <updated>2013-03-09T09:13:00-08:00</updated>
-    <id>http://j14159.github.com/blog/2013/03/09/espacewar-open-sourced</id>
+    <id>http://noisycode.com/blog/2013/03/09/espacewar-open-sourced</id>
     <content type="html"><![CDATA[<p><a href="https://github.com/j14159/eSpacewar">GitHub link for the lazy</a></p>
 
 <p><a href="http://esw.noisycode.com:8080/sw.html">Gameplay link for the lazy</a>, not guaranteed work <em>after</em> March 31, 2013</p>
@@ -26,7 +26,7 @@
 
 <p>As <a href="http://noisycode.com/blog/2013/03/02/testing-erlang-spacewar/">mentioned previously</a>, I built an online multiplayer-only version of <a href="http://en.wikipedia.org/wiki/Spacewar!">Spacewar!</a> using <a href="http://erlang.org">Erlang</a> for all of the game logic and <a href="https://github.com/extend/cowboy">Cowboy</a> for websocket communication with clients.  The only client at present is a very simple HTML canvas one, <a href="https://github.com/j14159/eSpacewar/blob/master/priv/sw.html">here is a direct link</a>.</p>
 
-<p><img src="http://static.ow.ly/photos/original/1E7sr.png"></p>
+<p><img class="<a" src="href="http://static.ow.ly/photos/original/1E7sr.png">http://static.ow.ly/photos/original/1E7sr.png</a>"></p>
 
 <h2>Why?</h2>
 
@@ -44,36 +44,36 @@
 
 <h3>Learning Erlang</h3>
 
-<p>Aside from my (so-far) abortive attempt to build a <a href="https://github.com/j14159/PawnShop">URL-shortener</a>, I haven't found an excuse to really dig into Erlang yet.  At the same time, I have been thinking for a while about the possibility of simple games via websockets.  The concurrency and responsiveness requirements for something like this make Erlang a natural choice.</p>
+<p>Aside from my (so-far) abortive attempt to build a <a href="https://github.com/j14159/PawnShop">URL-shortener</a>, I haven&rsquo;t found an excuse to really dig into Erlang yet.  At the same time, I have been thinking for a while about the possibility of simple games via websockets.  The concurrency and responsiveness requirements for something like this make Erlang a natural choice.</p>
 
 <h3>More With Websockets</h3>
 
-<p>They're still sort of stuck in standards-hell and probably not as good as they could be but I wanted to try them out in more depth.  I didn't consider comet for this because the nature of Spacewar requires a lot of small, rapid updates and I <em>suspected</em> (but cannot yet confirm) that the repeated connection setup overhead <em>might</em> negatively impact this.</p>
+<p>They&rsquo;re still sort of stuck in standards-hell and probably not as good as they could be but I wanted to try them out in more depth.  I didn&rsquo;t consider comet for this because the nature of Spacewar requires a lot of small, rapid updates and I <em>suspected</em> (but cannot yet confirm) that the repeated connection setup overhead <em>might</em> negatively impact this.</p>
 
-<p><strong>In actual fact</strong>, my assumption/suspicion is extremely likely to be <strong>totally wrong</strong> for the scope of this project.  It probably only makes a difference at an extremely high rate of messages (eSpacewar does a minimum of 20/second to each client) which I'm obviously not dealing with here.</p>
+<p><strong>In actual fact</strong>, my assumption/suspicion is extremely likely to be <strong>totally wrong</strong> for the scope of this project.  It probably only makes a difference at an extremely high rate of messages (eSpacewar does a minimum of 20/second to each client) which I&rsquo;m obviously not dealing with here.</p>
 
 <h3>Derp Cloud Derp</h3>
 
-<p>This one's easy.  I just wanted to see if a tiny EC2 node could actually handle it.  It mostly can but the t1.micro it's hosted on now tends to stutter occassionally.</p>
+<p>This one&rsquo;s easy.  I just wanted to see if a tiny EC2 node could actually handle it.  It mostly can but the t1.micro it&rsquo;s hosted on now tends to stutter occassionally.</p>
 
 <h2>What I Liked</h2>
 
 <h3>Erlang</h3>
 
-<p>I could probably go on forever about this (but won't here).  A few specific points that I ended up really loving:</p>
+<p>I could probably go on forever about this (but won&rsquo;t here).  A few specific points that I ended up really loving:</p>
 
 <ul>
 <li>Pattern matching permeates <em>everything</em> to the point that if/then/else just seems medieval.</li>
-<li>So easy to avoid shared state.  You just don't have any option (slight lie, go with it) so it makes things easier to keep clean.</li>
-<li>Clean, simple and minimal.  The core is so small and the emphasis on recursion so high that you're naturally pushed to composability (although you'll likely find gross contradictions in my code).</li>
+<li>So easy to avoid shared state.  You just don&rsquo;t have any option (slight lie, go with it) so it makes things easier to keep clean.</li>
+<li>Clean, simple and minimal.  The core is so small and the emphasis on recursion so high that you&rsquo;re naturally pushed to composability (although you&rsquo;ll likely find gross contradictions in my code).</li>
 </ul>
 
 
-<p>I didn't actually make much use of supervision so can't comment on that yet (but love it in the Akka/Scala world).</p>
+<p>I didn&rsquo;t actually make much use of supervision so can&rsquo;t comment on that yet (but love it in the Akka/Scala world).</p>
 
 <h3>Turns Out People Like It</h3>
 
-<p>Who knew?  Simple gameplay, easy to drop in and low requirements.  I've seen some great 10 player moments of mayhem.  Would have liked to see more but I think it would make playing almost impossible due to the number of torpedoes flying around.</p>
+<p>Who knew?  Simple gameplay, easy to drop in and low requirements.  I&rsquo;ve seen some great 10 player moments of mayhem.  Would have liked to see more but I think it would make playing almost impossible due to the number of torpedoes flying around.</p>
 
 <h2>What I Screwed Up</h2>
 
@@ -81,13 +81,13 @@
 
 <h3>Unit Tests</h3>
 
-<p>There aren't any.  I pretty much just slammed through this project to get things working and learn what I could.</p>
+<p>There aren&rsquo;t any.  I pretty much just slammed through this project to get things working and learn what I could.</p>
 
 <h3>Collision Detection</h3>
 
 <p>Collision detection occurs <em>after</em> an entity (torpedo, player) has been moved and is based on points in space.  This means that if players and/or torpedoes are moving quickly, they can appear to pass through each other.  This could be solved by using line segments to see if paths cross.</p>
 
-<p>A further issue is that the server side has no concept of the ship's shape.  It considers a ship to be a point with a certain bounding area and only registers a collision if two entities overlap.</p>
+<p>A further issue is that the server side has no concept of the ship&rsquo;s shape.  It considers a ship to be a point with a certain bounding area and only registers a collision if two entities overlap.</p>
 
 <h3>handle_info</h3>
 
@@ -97,40 +97,40 @@
 
 <h3>Records</h3>
 
-<p>I ended up not using records (just haven't looked closely at them yet) and used tuples everywhere.  I suspect I may have been able to simplify some state by using these but am unsure of how this would impact some of my pattern matching use.  I'm aware they're an extension of tuples but don't know if this enforces a certain structure.  An area for futher exploration.</p>
+<p>I ended up not using records (just haven&rsquo;t looked closely at them yet) and used tuples everywhere.  I suspect I may have been able to simplify some state by using these but am unsure of how this would impact some of my pattern matching use.  I&rsquo;m aware they&rsquo;re an extension of tuples but don&rsquo;t know if this enforces a certain structure.  An area for futher exploration.</p>
 
 <h3>Client</h3>
 
-<p>I'm clearly not an experienced JavaScript developer and need improvement (the playing space size is hard-coded, bad).  One of the areas I <em>wanted</em> to get into but didn't is WebGL but I'll leave that for later.</p>
+<p>I&rsquo;m clearly not an experienced JavaScript developer and need improvement (the playing space size is hard-coded, bad).  One of the areas I <em>wanted</em> to get into but didn&rsquo;t is WebGL but I&rsquo;ll leave that for later.</p>
 
 <h2>Conclusions</h2>
 
 <p>I put this into a repo at a fairly early state so you will be able to dig back and see the progression (it was much uglier before).</p>
 
-<p>As a result of this project, I'm confident enough with Erlang (and Cowboy) to start applying it to some more advanced/involved things so I'm going to push on with some new projects.  I'll undoubtably be posting progress on those at some time soon.</p>
+<p>As a result of this project, I&rsquo;m confident enough with Erlang (and Cowboy) to start applying it to some more advanced/involved things so I&rsquo;m going to push on with some new projects.  I&rsquo;ll undoubtably be posting progress on those at some time soon.</p>
 
-<p>The problems above, unfortunately, likely won't get fixed.  I've essentially learned what I set out to and eSpacewar has served well for that process.  Feel free to fork/host/modify, I'd appreciate a link to this blog if you decide to host it (or some derivative) somewhere else.</p>
+<p>The problems above, unfortunately, likely won&rsquo;t get fixed.  I&rsquo;ve essentially learned what I set out to and eSpacewar has served well for that process.  Feel free to fork/host/modify, I&rsquo;d appreciate a link to this blog if you decide to host it (or some derivative) somewhere else.</p>
 
-<p>Comments/criticism most welcome on <a href="http://twitter.com/j14159">Twitter</a> and in the comments below.  I'll consider pull requests on GitHub but don't really want to mess with this too much further (feel free to fork and fix/extend).</p>
+<p>Comments/criticism most welcome on <a href="http://twitter.com/j14159">Twitter</a> and in the comments below.  I&rsquo;ll consider pull requests on GitHub but don&rsquo;t really want to mess with this too much further (feel free to fork and fix/extend).</p>
 ]]></content>
   </entry>
   
   <entry>
     <title type="html"><![CDATA[Testing Erlang Spacewar]]></title>
-    <link href="http://j14159.github.com/blog/2013/03/02/testing-erlang-spacewar/"/>
+    <link href="http://noisycode.com/blog/2013/03/02/testing-erlang-spacewar/"/>
     <updated>2013-03-02T15:31:00-08:00</updated>
-    <id>http://j14159.github.com/blog/2013/03/02/testing-erlang-spacewar</id>
-    <content type="html"><![CDATA[<h2>What's Erlang Spacewar?</h2>
+    <id>http://noisycode.com/blog/2013/03/02/testing-erlang-spacewar</id>
+    <content type="html"><![CDATA[<h2>What&rsquo;s Erlang Spacewar?</h2>
 
-<p>A multiplayer version of <a href="http://en.wikipedia.org/wiki/Spacewar!">Spacewar!</a> built in <a href="http://erlang.org">Erlang</a> with <a href="https://github.com/extend/cowboy">Cowboy</a> using websockets.  For the moment, it's quite basic and really intended to be a proof-of-concept.  The idea was to see if it is even <em>possible</em> to use websockets for this sort of thing.</p>
+<p>A multiplayer version of <a href="http://en.wikipedia.org/wiki/Spacewar!">Spacewar!</a> built in <a href="http://erlang.org">Erlang</a> with <a href="https://github.com/extend/cowboy">Cowboy</a> using websockets.  For the moment, it&rsquo;s quite basic and really intended to be a proof-of-concept.  The idea was to see if it is even <em>possible</em> to use websockets for this sort of thing.</p>
 
-<p>Right now I'm just trying to get a sense of how it performs on a tiny little EC2 VM so I'd be most grateful if you could grab a couple friends and jump in when you have a few minutes to spare.  Fair warning:  I fully expect it to fall over and die if there are more than 50 or so people in there but I guess we'll find out.</p>
+<p>Right now I&rsquo;m just trying to get a sense of how it performs on a tiny little EC2 VM so I&rsquo;d be most grateful if you could grab a couple friends and jump in when you have a few minutes to spare.  Fair warning:  I fully expect it to fall over and die if there are more than 50 or so people in there but I guess we&rsquo;ll find out.</p>
 
-<p>I'll give you the link to play, don't worry, just a couple quick things...</p>
+<p>I&rsquo;ll give you the link to play, don&rsquo;t worry, just a couple quick things&hellip;</p>
 
 <h2>How Long Will It Work For?</h2>
 
-<p>I'm going to keep it live (aside from crashes, etc) for at least a couple of weeks I think.</p>
+<p>I&rsquo;m going to keep it live (aside from crashes, etc) for at least a couple of weeks I think.</p>
 
 <h2>What You Need:</h2>
 
@@ -138,19 +138,19 @@
 
 <h2>Problems You Can Expect</h2>
 
-<h3>It's Ugly</h3>
+<h3>It&rsquo;s Ugly</h3>
 
 <p>And I know.  No explosions yet, very minimal.</p>
 
-<h3>It's Choppy Sometimes</h3>
+<h3>It&rsquo;s Choppy Sometimes</h3>
 
-<p>It's running on a t1.micro in Amazon EC2's us-east-1 region.</p>
+<p>It&rsquo;s running on a t1.micro in Amazon EC2&rsquo;s us-east-1 region.</p>
 
-<p><strong>Translation</strong>:  it's got less than a full CPU core (really just uses spare cycles from other bigger VMs) and it's in Virginia so if you're on the West coast like me, expect some lag.</p>
+<p><strong>Translation</strong>:  it&rsquo;s got less than a full CPU core (really just uses spare cycles from other bigger VMs) and it&rsquo;s in Virginia so if you&rsquo;re on the West coast like me, expect some lag.</p>
 
 <h3>Crashes/Termination</h3>
 
-<p>I'll be messing with the code for the next week so do expect unavailability due to upgrades and crashes.</p>
+<p>I&rsquo;ll be messing with the code for the next week so do expect unavailability due to upgrades and crashes.</p>
 
 <h2>Please Do</h2>
 
@@ -160,17 +160,17 @@
 
 <h3>Share the link</h3>
 
-<p>But please share the link to this blog post - I'd like to give all test players the same warnings/notes I'm giving you.</p>
+<p>But please share the link to this blog post &ndash; I&rsquo;d like to give all test players the same warnings/notes I&rsquo;m giving you.</p>
 
 <h2>Are You Going To Release The Source?</h2>
 
-<p>Yes.  It'll be reasonably open (probably BSD or MIT license) on my <a href="https://github.com/j14159">github account</a> within a couple of weeks.  I'm still cleaning things up and moving to gen_server/proper OTP instead of bare Erlang processes.</p>
+<p>Yes.  It&rsquo;ll be reasonably open (probably BSD or MIT license) on my <a href="https://github.com/j14159">github account</a> within a couple of weeks.  I&rsquo;m still cleaning things up and moving to gen_server/proper OTP instead of bare Erlang processes.</p>
 
-<p>For the record, the repository will contain the grim history of almost all my mistakes.  It's been a learning experience.</p>
+<p>For the record, the repository will contain the grim history of almost all my mistakes.  It&rsquo;s been a learning experience.</p>
 
 <h1>Shut Up And Let Me Play!</h1>
 
-<p>Of course.  Here's the game, don't forget to enter a username and click "Start Playing":  <a href="http://esw.noisycode.com:8080/sw.html">Erlang Websocket Spacewar!</a></p>
+<p>Of course.  Here&rsquo;s the game, don&rsquo;t forget to enter a username and click &ldquo;Start Playing&rdquo;:  <a href="http://esw.noisycode.com:8080/sw.html">Erlang Websocket Spacewar!</a></p>
 ]]></content>
   </entry>
   

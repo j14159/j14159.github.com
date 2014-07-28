@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Learning Erlang + Clojure For Some Good - NoisyCode</title>
+  <title>Learning Erlang + Clojure for Some Good - NoisyCode</title>
   <meta name="author" content="Jeremy Pierre">
 
   
-  <meta name="description" content="Background Since pretty much everything I do at my day job involves Akka and Scala, Erlang&#8217;s been on my radar for quite a while. Using RabbitMQ &hellip;">
+  <meta name="description" content="Background Since pretty much everything I do at my day job involves Akka and Scala, Erlang&rsquo;s been on my radar for quite a while. Using RabbitMQ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,13 +18,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://j14159.github.com/blog/2012/10/21/pawnshop-in-which-i-learn-erlang-and-clojure-for-some-good/">
+  <link rel="canonical" href="http://noisycode.com/blog/2012/10/21/pawnshop-in-which-i-learn-erlang-and-clojure-for-some-good">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="/javascripts/ender.js"></script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="NoisyCode" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
 <link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
@@ -61,7 +62,7 @@
   
 <form action="http://google.com/search" method="get">
   <fieldset role="search">
-    <input type="hidden" name="q" value="site:j14159.github.com" />
+    <input type="hidden" name="q" value="site:noisycode.com" />
     <input class="search" type="text" name="q" results="0" placeholder="Search"/>
   </fieldset>
 </form>
@@ -96,7 +97,7 @@
   
 
 
-<time datetime="2012-10-21T17:22:00-07:00" pubdate data-updated="true">Oct 21<span>st</span>, 2012</time>
+<time datetime="2012-10-21T17:22:00-07:00" pubdate data-updated="true">Oct 21<sup>st</sup>, 2012</time>
         
       </p>
     
@@ -105,22 +106,22 @@
 
 <div class="entry-content"><h2>Background</h2>
 
-<p>Since pretty much everything I do at my <a href="http://twitter.com/hootsuite">day job</a> involves Akka and Scala, Erlang&#8217;s been on my radar for quite a while.  Using RabbitMQ in current products and considering Riak to solve some nasty storage issues has of course heightened my interest in it as well.  Thanks to <a href="http://twitter.com/ujm">@ujm</a> and <a href="http://twitter.com/tavisrudd">@tavisrudd</a> I&#8217;ve also been hearing a lot about Clojure for the past year or so and it has (not so) mysteriously turned up in a few testing tools at the aforementioned day job due to <a href="http://twitter.com/ujm">@ujm</a>&#8217;s unbridled love for it.  As I&#8217;ve been trying to improve my own approach to and understanding of functional programming, it seemed both natural and frankly exciting to dive into something involving both.</p>
+<p>Since pretty much everything I do at my <a href="http://twitter.com/hootsuite">day job</a> involves Akka and Scala, Erlang&rsquo;s been on my radar for quite a while.  Using RabbitMQ in current products and considering Riak to solve some nasty storage issues has of course heightened my interest in it as well.  Thanks to <a href="http://twitter.com/ujm">@ujm</a> and <a href="http://twitter.com/tavisrudd">@tavisrudd</a> I&rsquo;ve also been hearing a lot about Clojure for the past year or so and it has (not so) mysteriously turned up in a few testing tools at the aforementioned day job due to <a href="http://twitter.com/ujm">@ujm</a>&rsquo;s unbridled love for it.  As I&rsquo;ve been trying to improve my own approach to and understanding of functional programming, it seemed both natural and frankly exciting to dive into something involving both.</p>
 
 <h2>The Pitfall</h2>
 
-<p>This brings up a minor pet peeve of mine:  while evaluating something new and interesting, people often come up with trivial example projects and in the past, I&#8217;ve been possibly more guilty than most.  This is something I want very much to avoid now.  The problems I&#8217;ve seen in myself with using something <em>too</em> trivial to evaluate and learn new things are:</p>
+<p>This brings up a minor pet peeve of mine:  while evaluating something new and interesting, people often come up with trivial example projects and in the past, I&rsquo;ve been possibly more guilty than most.  This is something I want very much to avoid now.  The problems I&rsquo;ve seen in myself with using something <em>too</em> trivial to evaluate and learn new things are:</p>
 
 <ul>
-<li>performance assumptions are never grounded in reality when your code doesn&#8217;t do anything realistic.  A perfect example is testing concurrent websocket connection limits that simply echo input (I did this with Play! 2.0 and I&#8217;ve seen some naive numbers from the node.js crowd mentioned lately as well).</li>
-<li>simple projects rarely expose some of the strange corners of a language or platform.  Anyone who has extensively used Scala&#8217;s implicits or made extensive use of futures and promises will understand this.</li>
-<li>most importantly overly trivial projects won&#8217;t expose your <strong>own</strong> weaknesses and misunderstandings early on.</li>
+<li>performance assumptions are never grounded in reality when your code doesn&rsquo;t do anything realistic.  A perfect example is testing concurrent websocket connection limits that simply echo input (I did this with Play! 2.0 and I&rsquo;ve seen some naive numbers from the node.js crowd mentioned lately as well).</li>
+<li>simple projects rarely expose some of the strange corners of a language or platform.  Anyone who has extensively used Scala&rsquo;s implicits or made extensive use of futures and promises will understand this.</li>
+<li>most importantly overly trivial projects won&rsquo;t expose your <strong>own</strong> weaknesses and misunderstandings early on.</li>
 </ul>
 
 
 <h2>Some Goals</h2>
 
-<p>Given the above, there are a few specific challenges I&#8217;m looking to work on with this project in both Erlang and Clojure:</p>
+<p>Given the above, there are a few specific challenges I&rsquo;m looking to work on with this project in both Erlang and Clojure:</p>
 
 <ul>
 <li>unique ID generation without a central locking resource.  I want to be able to establish total ordering without any central coordination.  <em>Loose</em> temporal ordering is a nice to have.</li>
@@ -134,16 +135,16 @@
 <li>learn to use their build tools (Leiningen and Rebar)</li>
 <li>loosen my reliance on object orientation</li>
 <li>get more comfortable with dynamic typing (I tend to yell a lot about the supremacy of static typing).</li>
-<li>experiment with a heterogeneous solution.  I&#8217;ll be building the same thing in both languages so I think some interesting comparisons could arise with regard to things like deployment, configuration and performance.</li>
+<li>experiment with a heterogeneous solution.  I&rsquo;ll be building the same thing in both languages so I think some interesting comparisons could arise with regard to things like deployment, configuration and performance.</li>
 </ul>
 
 
-<p>Naturally I&#8217;m going to make a few rules for myself, the first and most important being that I&#8217;m not going to hide my mistakes.  When I change my mind or screw up, all the details will be in the commit history.  Second, the whole thing will be open source so that anyone will be able to see my pace, changes and progress in github at any time.
-Lastly, I&#8217;ll welcome feedback and optimization suggestions(with credit given where credit is due) but won&#8217;t accept pull requests or massive rewrites from anyone - this is mine to learn and mess up.</p>
+<p>Naturally I&rsquo;m going to make a few rules for myself, the first and most important being that I&rsquo;m not going to hide my mistakes.  When I change my mind or screw up, all the details will be in the commit history.  Second, the whole thing will be open source so that anyone will be able to see my pace, changes and progress in github at any time.
+Lastly, I&rsquo;ll welcome feedback and optimization suggestions(with credit given where credit is due) but won&rsquo;t accept pull requests or massive rewrites from anyone &ndash; this is mine to learn and mess up.</p>
 
 <h2>The Actual Project</h2>
 
-<p>I&#8217;m going to build a simple URL shortener and image hosting service called <a href="http://github.com/j14159/PawnShop">PawnShop</a> with the following basic features:</p>
+<p>I&rsquo;m going to build a simple URL shortener and image hosting service called <a href="http://github.com/j14159/PawnShop">PawnShop</a> with the following basic features:</p>
 
 <ul>
 <li>exchange a URL for a short hash</li>
@@ -151,7 +152,7 @@ Lastly, I&#8217;ll welcome feedback and optimization suggestions(with credit giv
 <li>upload an image (png/jpeg) in return for a short hash</li>
 <li>redirect HTTP requests for a URL hash to the original</li>
 <li>display the matching submitted image for a given requested hash</li>
-<li>track click stats for each hash generated.  I&#8217;ll store these at millisecond resolution.</li>
+<li>track click stats for each hash generated.  I&rsquo;ll store these at millisecond resolution.</li>
 <li>display hosted images inside a minimal template</li>
 <li>provide a REST API to retrieve click stats, likely report by one hour intervals at the smallest at first.</li>
 <li>basic authentication via email address and password</li>
@@ -170,15 +171,15 @@ Lastly, I&#8217;ll welcome feedback and optimization suggestions(with credit giv
 
 <ul>
 <li>This will be a single monolithic project, no interdependent services.</li>
-<li>It will be heterogeneous in that I want to be able to run the Erlang version side by side with the Clojure version in the same cluster, off the same database, behind the same load balancer and things should Just Work (TM).</li>
-<li>I&#8217;m going to use standard web frameworks, likely <a href="http://webnoir.org">Noir</a> and either <a href="http://chicagoboss.org">Chicago Boss</a> or <a href="http://nitrogenproject.com">Nitrogen</a></li>
-<li>The only data store I&#8217;ll be using is Riak.</li>
+<li>It will be heterogeneous in that I want to be able to run the Erlang version side by side with the Clojure version in the same cluster, off the same database, behind the same load balancer and things should Just Work &trade;.</li>
+<li>I&rsquo;m going to use standard web frameworks, likely <a href="http://webnoir.org">Noir</a> and either <a href="http://chicagoboss.org">Chicago Boss</a> or <a href="http://nitrogenproject.com">Nitrogen</a></li>
+<li>The only data store I&rsquo;ll be using is Riak.</li>
 </ul>
 
 
 <h2>Following Along</h2>
 
-<p>I&#8217;m going to aim for roughly a post-per-week here.  Blog posts related to PawnShop will essentially be a notebook/journal of my reasoning for certain decisions as well as both negative and positive experiences throughout the learning and development process.</p>
+<p>I&rsquo;m going to aim for roughly a post-per-week here.  Blog posts related to PawnShop will essentially be a notebook/journal of my reasoning for certain decisions as well as both negative and positive experiences throughout the learning and development process.</p>
 
 <p><a href="http://github.com/j14159/PawnShop"><strong>GitHub</strong></a></p>
 
@@ -186,14 +187,14 @@ Lastly, I&#8217;ll welcome feedback and optimization suggestions(with credit giv
 
 <h2>Riak and the Data Model</h2>
 
-<p>A while ago, <a href="http://twitter.com/jamesgolick">@jamesgolick</a> told me I wasn&#8217;t allowed to use Riak until I had read the famous Dynamo paper in its entirety.  He&#8217;s right, and you should <a href="http://s3.amazonaws.com/AllThingsDistributed/sosp/amazon-dynamo-sosp2007.pdf">read it too</a> if you haven&#8217;t yet.</p>
+<p>A while ago, <a href="http://twitter.com/jamesgolick">@jamesgolick</a> told me I wasn&rsquo;t allowed to use Riak until I had read the famous Dynamo paper in its entirety.  He&rsquo;s right, and you should <a href="http://s3.amazonaws.com/AllThingsDistributed/sosp/amazon-dynamo-sosp2007.pdf">read it too</a> if you haven&rsquo;t yet.</p>
 
 <p>A URL shortener model seems a great fit for an eventually consistent Dynamo-style store like Riak.</p>
 
 <ul>
 <li>To shorten URLs and host pictures, you want high consistency for DB writes meaning that when a user submits new data, you want the write to complete with reasonable certainty.</li>
-<li>To retrieve URLs, low read consistency (small quorum) is OK.  Since we&#8217;re not <strong>mutating</strong> URL and picture entries, we don&#8217;t have to worry about an update that might not have hit replicas yet.</li>
-<li>To add and retrieve click stats, low read and write consistency is fine.  Missing one or two clicks out of thousands for a single report isn&#8217;t the end of the world, we just want reasonable accuracy when the stats are requested and eventually high accuracy.  If it takes a few hours for this to happen, so be it.</li>
+<li>To retrieve URLs, low read consistency (small quorum) is OK.  Since we&rsquo;re not <strong>mutating</strong> URL and picture entries, we don&rsquo;t have to worry about an update that might not have hit replicas yet.</li>
+<li>To add and retrieve click stats, low read and write consistency is fine.  Missing one or two clicks out of thousands for a single report isn&rsquo;t the end of the world, we just want reasonable accuracy when the stats are requested and eventually high accuracy.  If it takes a few hours for this to happen, so be it.</li>
 </ul>
 
 
@@ -201,7 +202,7 @@ Lastly, I&#8217;ll welcome feedback and optimization suggestions(with credit giv
 
 <h3>statsd</h3>
 
-<p>Since I&#8217;m going to monitor the hell out of everything, I&#8217;ll assume something statsd-compatible is available wherever this project runs.  These days I don&#8217;t think this is really an option at all for any sort of sane environment.</p>
+<p>Since I&rsquo;m going to monitor the hell out of everything, I&rsquo;ll assume something statsd-compatible is available wherever this project runs.  These days I don&rsquo;t think this is really an option at all for any sort of sane environment.</p>
 
 <h2>Next Steps</h2>
 
@@ -239,12 +240,12 @@ Lastly, I&#8217;ll welcome feedback and optimization suggestions(with credit giv
   
 
 
-<time datetime="2012-10-21T17:22:00-07:00" pubdate data-updated="true">Oct 21<span>st</span>, 2012</time>
+<time datetime="2012-10-21T17:22:00-07:00" pubdate data-updated="true">Oct 21<sup>st</sup>, 2012</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/clojure/'>Clojure</a>, <a class='category' href='/blog/categories/erlang/'>Erlang</a>, <a class='category' href='/blog/categories/pawnshop/'>PawnShop</a>
+    <a class='category' href='/blog/categories/clojure/'>clojure</a>, <a class='category' href='/blog/categories/erlang/'>erlang</a>, <a class='category' href='/blog/categories/pawnshop/'>pawnshop</a>
   
 </span>
 
@@ -253,7 +254,7 @@ Lastly, I&#8217;ll welcome feedback and optimization suggestions(with credit giv
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://j14159.github.com/blog/2012/10/21/pawnshop-in-which-i-learn-erlang-and-clojure-for-some-good/" data-via="j14159" data-counturl="http://j14159.github.com/blog/2012/10/21/pawnshop-in-which-i-learn-erlang-and-clojure-for-some-good/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://noisycode.com/blog/2012/10/21/pawnshop-in-which-i-learn-erlang-and-clojure-for-some-good/" data-via="j14159" data-counturl="http://noisycode.com/blog/2012/10/21/pawnshop-in-which-i-learn-erlang-and-clojure-for-some-good/" >Tweet</a>
   
   
   
@@ -296,11 +297,11 @@ Lastly, I&#8217;ll welcome feedback and optimization suggestions(with credit giv
       </li>
     
       <li class="post">
-        <a href="/blog/2012/10/23/posterity-00-ia32-memory-management/">Posterity 00:  IA32 Memory Management</a>
+        <a href="/blog/2012/10/23/posterity-00-ia32-memory-management/">Posterity 00: IA32 Memory Management</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2012/10/21/pawnshop-in-which-i-learn-erlang-and-clojure-for-some-good/">Learning Erlang + Clojure For Some Good</a>
+        <a href="/blog/2012/10/21/pawnshop-in-which-i-learn-erlang-and-clojure-for-some-good/">Learning Erlang + Clojure for Some Good</a>
       </li>
     
   </ul>
@@ -315,7 +316,7 @@ Lastly, I&#8217;ll welcome feedback and optimization suggestions(with credit giv
   <a href="https://github.com/j14159">@j14159</a> on GitHub
   
   <script type="text/javascript">
-    $.domReady(function(){
+    $(document).ready(function(){
         if (!window.jXHR){
             var jxhr = document.createElement('script');
             jxhr.type = 'text/javascript';
@@ -371,7 +372,7 @@ Lastly, I&#8217;ll welcome feedback and optimization suggestions(with credit giv
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2013 - Jeremy Pierre -
+  Copyright &copy; 2014 - Jeremy Pierre -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 
@@ -383,13 +384,13 @@ Lastly, I&#8217;ll welcome feedback and optimization suggestions(with credit giv
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://j14159.github.com/blog/2012/10/21/pawnshop-in-which-i-learn-erlang-and-clojure-for-some-good/';
-        var disqus_url = 'http://j14159.github.com/blog/2012/10/21/pawnshop-in-which-i-learn-erlang-and-clojure-for-some-good/';
+        var disqus_identifier = 'http://noisycode.com/blog/2012/10/21/pawnshop-in-which-i-learn-erlang-and-clojure-for-some-good/';
+        var disqus_url = 'http://noisycode.com/blog/2012/10/21/pawnshop-in-which-i-learn-erlang-and-clojure-for-some-good/';
         var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
     }());
 </script>
@@ -405,7 +406,7 @@ Lastly, I&#8217;ll welcome feedback and optimization suggestions(with credit giv
       var twitterWidgets = document.createElement('script');
       twitterWidgets.type = 'text/javascript';
       twitterWidgets.async = true;
-      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
       document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
     })();
   </script>
