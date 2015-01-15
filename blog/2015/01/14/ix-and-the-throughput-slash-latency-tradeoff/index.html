@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Category: Erlang - NoisyCode</title>
+  <title>IX and the Throughput/latency Tradeoff - NoisyCode</title>
   <meta name="author" content="Jeremy Pierre">
 
   
-  <meta name="description" content="Category: erlang">
+  <meta name="description" content="Since Saem put me onto the Coursera &ldquo;Learning How To Learn&rdquo; course and Tavis (as well as Tyler iirc) pointed me at Scott Young, I&rsquo; &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://noisycode.com/blog/categories/erlang">
+  <link rel="canonical" href="http://noisycode.com/blog/2015/01/14/ix-and-the-throughput-slash-latency-tradeoff">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="NoisyCode" type="application/atom+xml">
@@ -77,67 +77,130 @@
   <div id="main">
     <div id="content">
       <div>
-<article role="article">
+<article class="hentry" role="article">
   
   <header>
-    <h1 class="entry-title">Category: Erlang</h1>
+    
+      <h1 class="entry-title">IX and the Throughput/latency Tradeoff</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-01-14T19:22:22-08:00" pubdate data-updated="true">Jan 14<sup>th</sup>, 2015</time>
+        
+      </p>
     
   </header>
-  
-  <div id="blog-archives" class="category">
 
 
+<div class="entry-content"><p>Since <a href="https://twitter.com/saemg">Saem</a> put me onto the Coursera <a href="https://class.coursera.org/learning-003">&ldquo;Learning How To Learn&rdquo;</a> course and <a href="https://twitter.com/tavisrudd">Tavis</a> (as well as <a href="https://twitter.com/tylerweir">Tyler</a> iirc) pointed me at <a href="http://www.scotthyoung.com/blog/">Scott Young</a>, I&rsquo;ve been trying to figure out how to better approach learning all of the material I try to throw at myself.</p>
 
-  
-  <h2>2013</h2>
+<p>This coming Monday for the <a href="https://plus.google.com/u/0/communities/110886264051164890990">Polyglot reading group</a> we&rsquo;re covering the <a href="https://www.usenix.org/conference/osdi14/technical-sessions/presentation/belay">IX protected dataplane OS</a> <a href="https://www.usenix.org/system/files/conference/osdi14/osdi14-paper-belay.pdf">paper</a> which describes a set of tradeoffs that operating systems must make when deciding how to handle IO (network in this case).</p>
 
-<article>
-  
-<h1><a href="/blog/2013/03/09/espacewar-open-sourced/">eSpacewar Open Sourced</a></h1>
-<time datetime="2013-03-09T09:13:00-08:00" pubdate><span class='month'>Mar</span> <span class='day'>09</span> <span class='year'>2013</span></time>
+<p>While initially skimming the paper to try to figure out how I might chunk it to build a more cohesive understanding, I realized that I had an intuitive grip on the tradeoff between throughput and latency but I&rsquo;d never tried to properly define it for myself.  Being able to clearly define something I think is a mark of actual understanding and builds the ability to leverage it.  I figured this would be a good exercise in that spirit and both Dr Oakley and Scott Young seem to agree from what I&rsquo;ve seen so far.</p>
 
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/erlang/'>erlang</a>, <a class='category' href='/blog/categories/spacewar/'>spacewar</a></span>
-</footer>
+<h1>My Attempt</h1>
 
+<p>Describe throughput, latency, and the tradeoff between them as generally as possible but with a view to how they pertain to the IX paper.</p>
 
-</article>
+<h2>Throughput</h2>
 
+<p>Is a measure of how much <em>uninterrupted</em> work can be done.</p>
 
+<h2>Latency</h2>
 
-<article>
-  
-<h1><a href="/blog/2013/03/02/testing-erlang-spacewar/">Testing Erlang Spacewar</a></h1>
-<time datetime="2013-03-02T15:31:00-08:00" pubdate><span class='month'>Mar</span> <span class='day'>02</span> <span class='year'>2013</span></time>
+<p>Is a measure of how long it takes from submission of some work until its completion.</p>
 
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/erlang/'>erlang</a>, <a class='category' href='/blog/categories/spacewar/'>spacewar</a></span>
-</footer>
+<p>I think &ldquo;submission&rdquo; is likely interchangeable with any of the following if you prefer:</p>
 
-
-</article>
+<ul>
+<li>definition</li>
+<li>creation</li>
+<li>identification</li>
+</ul>
 
 
+<h2>The Tradeoff</h2>
 
-  
-  <h2>2012</h2>
+<p>In a system with limited capacity to do work, latency is proportional to the ability to interrupt existing work.  If interruption of current work is <em>not</em> permitted, meaning existing work proceeds with <em>no breaks</em>, the latency is equivalent to the time it takes to complete the pre-existing work because the system cannot do the new work until it finishes the <em>existing</em> work.  If interruptions <em>are</em> permitted without restriction, throughput is entirely bound by the frequency of interruptions.</p>
 
-<article>
-  
-<h1><a href="/blog/2012/10/21/pawnshop-in-which-i-learn-erlang-and-clojure-for-some-good/">Learning Erlang + Clojure for Some Good</a></h1>
-<time datetime="2012-10-21T17:22:00-07:00" pubdate><span class='month'>Oct</span> <span class='day'>21</span> <span class='year'>2012</span></time>
+<p>In a system that preempts work, the balance is struck by limiting the frequency of interruptions.</p>
 
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/clojure/'>clojure</a>, <a class='category' href='/blog/categories/erlang/'>erlang</a>, <a class='category' href='/blog/categories/pawnshop/'>pawnshop</a></span>
-</footer>
+<p>In a cooperative system, the balance is struck by yielding control after an alotted amount of work is done (note that this depends on altruistic workers).</p>
 
+<h1>Next</h1>
 
-</article>
+<p>I&rsquo;m going to try to apply this same sort of approach for simpler base concepts.  I think it&rsquo;s roughly in line with the <a href="http://www.scotthyoung.com/learnonsteroids/grab/TranscriptFeynman.pdf">Feynman technique</a> albeit simplified for the moment perhaps.</p>
 
+<p>If you disagree with my definition with respect to the IX paper, I&rsquo;d love to hear about it.  As mentioned I&rsquo;ve only skimmed the paper so far and so it&rsquo;s entirely likely my definition and/or understanding will change a bit as I dig in deeper.</p>
 </div>
 
+
+  <footer>
+    <p class="meta">
+      
   
+
+<span class="byline author vcard">Posted by <span class="fn">Jeremy Pierre</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-01-14T19:22:22-08:00" pubdate data-updated="true">Jan 14<sup>th</sup>, 2015</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/learning/'>learning</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://noisycode.com/blog/2015/01/14/ix-and-the-throughput-slash-latency-tradeoff/" data-via="j14159" data-counturl="http://noisycode.com/blog/2015/01/14/ix-and-the-throughput-slash-latency-tradeoff/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2014/12/07/becoming-better/" title="Previous Post: Becoming Better">&laquo; Becoming Better</a>
+      
+      
+    </p>
+  </footer>
 </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
 
 </div>
 
@@ -246,7 +309,10 @@
       var disqus_shortname = 'noisycode';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://noisycode.com/blog/2015/01/14/ix-and-the-throughput-slash-latency-tradeoff/';
+        var disqus_url = 'http://noisycode.com/blog/2015/01/14/ix-and-the-throughput-slash-latency-tradeoff/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
