@@ -1,0 +1,368 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Cluster Reading List - NoisyCode</title>
+  <meta name="author" content="Jeremy Pierre">
+
+  
+  <meta name="description" content="At work we use Mesos to manage a dynamic pool of resources for our Spark jobs and while I&rsquo;ve also dabbled with Hadoop in the past, I&rsquo;ve &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://noisycode.com/blog/2015/02/28/cluster-reading-list">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="NoisyCode" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-35745774-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">NoisyCode</a></h1>
+  
+    <h2>f(x) -> ~dac</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:noisycode.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/about">About</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Cluster Reading List</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-02-28T14:28:38-08:00" pubdate data-updated="true">Feb 28<sup>th</sup>, 2015</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>At <a href="http://askuity.com">work</a> we use <a href="http://mesos.apache.org/">Mesos</a> to manage a dynamic pool of resources for our <a href="http://spark.apache.org">Spark</a> jobs and while I&rsquo;ve also dabbled with <a href="http://hadoop.apache.org/">Hadoop</a> in the past, I&rsquo;ve found my understanding of the mechanics and initial design concerns of all of the above a bit lacking.  Rather than parrotting the standard marketing lines, I wanted to understand the fundamental reasons and motivation behind treating a pool of machines (virtual or otherwise) as an anonymized pile of aggregate CPUs and RAM for many different types of work.  A non-exhaustive list of things I want to understand are:</p>
+
+<ul>
+<li>How are larger jobs broken down and parallelized?</li>
+<li>How are parts of jobs made to coexist in an environment of constantly changing demands?</li>
+<li>How do we ensure full utilization of extant resources and do we <em>need</em> to in a cloud environment as opposed to  simply scaling the resources?</li>
+<li>While I understand the basics of being concerned with &ldquo;data locality&rdquo; (get the computation as close as possible to the data), what are some practical ways to achieve this in a general way, applicable to many applications?</li>
+</ul>
+
+
+<p>In hopes of answering these (and other) questions, I started to compile this reading list of papers that seemed like they would help answer them.  An earlier form of this list was posted as a gist <a href="https://gist.github.com/j14159/19d100a556effacd1475">here</a>.</p>
+
+<p>At present I have completed the Google File System, MapReduce, and Microsoft Dryad papers, all of which I have thoroughly enjoyed reading and they have already contributed to a better understanding of how I should be approaching Spark.</p>
+
+<h1>The List</h1>
+
+<p>This list was built primarily by crawling through the references sections of a few different papers.  Some of these have come by way of suggestions from <a href="https://twitter.com/omarkj">Omar</a> and <a href="https://twitter.com/ook">Michael</a> as noted below.  In pursuit of a reasonable reading and study plan for myself, I tried to lay the material out in something of a logical path from early successes to more recent ideas and implementations.</p>
+
+<p>If you feel I&rsquo;ve left out anything particularly awesome or am incorrect in any assumptions/descriptions with respect to the later papers, I&rsquo;d love to hear about it and will update my list accordingly.</p>
+
+<h2>Fundamentals</h2>
+
+<p>A brief list of papers and ideas that I thought would give me something of a foundation in what the main problems, concerns, and early solutions were.</p>
+
+<ol>
+<li><a href="http://static.googleusercontent.com/media/research.google.com/en//archive/gfs-sosp2003.pdf">Google File System</a> &ndash; most of the later material references this paper and it seems like this enabled a lot of other ideas later on.  The distribution of chunks of a file around a cluster enables a lot of interesting data locality stuff.</li>
+<li><a href="http://static.googleusercontent.com/media/research.google.com/en//archive/mapreduce-osdi04.pdf">Google MapReduce</a> &ndash; a pretty lucid and well thought out divide-and-conquer approach to parallelizing a huge job.  The functional programming part of me loved the LISP shout-out/inspiration.</li>
+<li><a href="http://research.microsoft.com/en-us/projects/dryad/eurosys07.pdf">Dryad</a> for a more fine-grained/raw approach to programming against a cluster.</li>
+<li><a href="http://www.sigops.org/sosp/sosp09/papers/isard-sosp09.pdf">Quincy</a> is, from what I understand so far, a more detailed look at an alternative scheduler for Dryad.</li>
+<li><a href="http://people.csail.mit.edu/matei/papers/2010/eurosys_delay_scheduling.pdf">Delay Scheduling</a> for a detailed look at a different Hadoop scheduler.  Note the involvement of <a href="https://twitter.com/matei_zaharia">Matei Zaharia</a> who later worked on both the Mesos and Spark projects.</li>
+</ol>
+
+
+<h2>Cluster Schedulers</h2>
+
+<p>Just the two big ones here, unfortunately there don&rsquo;t seem to be any papers out there on Google&rsquo;s Borg project.</p>
+
+<ol>
+<li><a href="http://people.csail.mit.edu/matei/papers/2011/nsdi_mesos.pdf">Mesos</a> as mentioned above is what I currently use to manage Spark resources.</li>
+<li><a href="http://eurosys2013.tudos.org/wp-content/uploads/2013/paper/Schwarzkopf.pdf">Omega</a> is (was?) a project whose aim is/was to fix shortcomings in Google&rsquo;s existing cluster scheduling/management system (assuming Borg).</li>
+</ol>
+
+
+<h2>More Programming Models</h2>
+
+<ol>
+<li><a href="https://www.usenix.org/legacy/event/osdi08/tech/full_papers/yu_y/yu_y.pdf">DryadLINQ</a> is a higher-level programming model built on top of Dryad.  Composition FTW.</li>
+<li><a href="http://kowshik.github.io/JPregel/pregel_paper.pdf">Pregel</a> a graph processing paper from Google.  References Dryad as well but I&rsquo;m not sure how close it is as I haven&rsquo;t read it yet and it seems to be less about dataflow.</li>
+<li><a href="http://db.cs.berkeley.edu/papers/nsdi10-hop.pdf">MapReduce Online</a> for an iterative MapReduce.</li>
+<li><a href="http://vldb.org/pvldb/vol5/p716_yuchenglow_vldb2012.pdf">Distributed GraphLab</a> sounds like another graph-like computation model but one that embraces asynchrony and parallelism a bit more.  Possibly belongs in the next category but I&rsquo;m not sure yet.</li>
+</ol>
+
+
+<h2>Data Flow</h2>
+
+<ol>
+<li><a href="http://static.googleusercontent.com/media/research.google.com/en//pubs/archive/41378.pdf">MillWheel</a> as recommended by <a href="https://twitter.com/omarkj">Omar</a> talks about stream processing but does appear to tackle the problem with a form of computation graph that looks like a dataflow approach.</li>
+<li><a href="http://sigops.org/sosp/sosp13/papers/p439-murray.pdf">Naiad</a> is relatively recent from Microsoft Research (2013) and intriguingly mentions &ldquo;cyclic dataflow&rdquo; (also via <a href="https://twitter.com/omarkj">Omar</a>).</li>
+<li><a href="https://www.info.ucl.ac.be/~pvr/erlang14cameraready.pdf">Derflow</a> is about &ldquo;deterministic dataflow&rdquo; with Erlang.  Sounds too good to pass up.</li>
+</ol>
+
+
+<h2>Big Ideas</h2>
+
+<ol>
+<li><a href="http://research.cs.wisc.edu/htcondor/doc/condor-practice.pdf">Condor</a> is referenced both by MapReduce and Dryad as an inspiration for cluster management approaches so I&rsquo;ve added it to get a bit more perspective at the end.</li>
+<li><a href="http://www.morganclaypool.com/doi/pdf/10.2200/S00193ED1V01Y200905CAC006">The Datacenter as a Computer</a> (thanks to <a href="https://twitter.com/ook">Michael</a> for the reminder) is a bit over 100 pages but seems to cover a lot more of Google&rsquo;s general approach to clusters and more.</li>
+</ol>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Jeremy Pierre</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-02-28T14:28:38-08:00" pubdate data-updated="true">Feb 28<sup>th</sup>, 2015</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://noisycode.com/blog/2015/02/28/cluster-reading-list/" data-via="j14159" data-counturl="http://noisycode.com/blog/2015/02/28/cluster-reading-list/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/01/14/ix-and-the-throughput-slash-latency-tradeoff/" title="Previous Post: IX and the throughput/latency tradeoff">&laquo; IX and the throughput/latency tradeoff</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/02/28/cluster-reading-list/">Cluster Reading List</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/01/14/ix-and-the-throughput-slash-latency-tradeoff/">IX and the Throughput/latency Tradeoff</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/12/07/becoming-better/">Becoming Better</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/07/27/akka-and-jdbc-to-services/">Akka and JDBC to Services</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/03/09/espacewar-open-sourced/">eSpacewar Open Sourced</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/j14159">@j14159</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'j14159',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("j14159", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/j14159" class="twitter-follow-button" data-show-count="false">Follow @j14159</a>
+  
+</section>
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/113367554135338391023?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Jeremy Pierre -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'noisycode';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://noisycode.com/blog/2015/02/28/cluster-reading-list/';
+        var disqus_url = 'http://noisycode.com/blog/2015/02/28/cluster-reading-list/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

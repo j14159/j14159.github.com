@@ -4,7 +4,7 @@
   <title><![CDATA[Category: learning | NoisyCode]]></title>
   <link href="http://noisycode.com/blog/categories/learning/atom.xml" rel="self"/>
   <link href="http://noisycode.com/"/>
-  <updated>2015-01-14T20:29:56-08:00</updated>
+  <updated>2015-02-28T16:14:50-08:00</updated>
   <id>http://noisycode.com/</id>
   <author>
     <name><![CDATA[Jeremy Pierre]]></name>
@@ -58,6 +58,20 @@
 <p>I&rsquo;m going to try to apply this same sort of approach for simpler base concepts.  I think it&rsquo;s roughly in line with the <a href="http://www.scotthyoung.com/learnonsteroids/grab/TranscriptFeynman.pdf">Feynman technique</a> albeit simplified for the moment perhaps.</p>
 
 <p>If you disagree with my definition with respect to the IX paper, I&rsquo;d love to hear about it.  As mentioned I&rsquo;ve only skimmed the paper so far and so it&rsquo;s entirely likely my definition and/or understanding will change a bit as I dig in deeper.</p>
+
+<h1>Update</h1>
+
+<p>Thanks to <a href="https://twitter.com">Saem</a> poking holes in the above definition, I&rsquo;ve started to refine it a bit.  The primary issue he turned up is that nowhere did I specify a cost for the interruptions required by latency and this further turned up an error in my definition of latency.  I&rsquo;ve adjusted the definition of latency and the tradeoff as follows:</p>
+
+<h2>Latency</h2>
+
+<p>Is a measure of the time from submission of work until some acknowledgement that the work is proceeding.  Servicing latency requires a non-zero amount of work because the expected minimum of the acknowledgement itself is work.</p>
+
+<p>Note that this definition is primarily concerned with responsiveness rather than completeness of the submitted work and that latency consumes some measure of available throughput since it requires work.</p>
+
+<h2>The Tradeoff</h2>
+
+<p>A system with a limited capacity to do work, like a computer, is one with a bounded or static throughput.  In order for this system to provide the lowest possible latency, it must be able to interrupt existing work without restriction and consume throughput for <em>at least</em> acknowledgement of the receipt of new work.  On the other hand, to provide the highest possible throughput the system must prevent interruptions that also wish to consume its limited resource in favour of any existing work&rsquo;s use of it.</p>
 ]]></content>
   </entry>
   

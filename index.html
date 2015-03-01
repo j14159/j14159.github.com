@@ -9,7 +9,7 @@
   <meta name="author" content="Jeremy Pierre">
 
   
-  <meta name="description" content="Since Saem put me onto the Coursera &ldquo;Learning How To Learn&rdquo; course and Tavis (as well as Tyler iirc) pointed me at Scott Young, I&rsquo; &hellip;">
+  <meta name="description" content="At work we use Mesos to manage a dynamic pool of resources for our Spark jobs and while I&rsquo;ve also dabbled with Hadoop in the past, I&rsquo;ve &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -84,6 +84,110 @@
       
   <header>
     
+      <h1 class="entry-title"><a href="/blog/2015/02/28/cluster-reading-list/">Cluster Reading List</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-02-28T14:28:38-08:00" pubdate data-updated="true">Feb 28<sup>th</sup>, 2015</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>At <a href="http://askuity.com">work</a> we use <a href="http://mesos.apache.org/">Mesos</a> to manage a dynamic pool of resources for our <a href="http://spark.apache.org">Spark</a> jobs and while I&rsquo;ve also dabbled with <a href="http://hadoop.apache.org/">Hadoop</a> in the past, I&rsquo;ve found my understanding of the mechanics and initial design concerns of all of the above a bit lacking.  Rather than parrotting the standard marketing lines, I wanted to understand the fundamental reasons and motivation behind treating a pool of machines (virtual or otherwise) as an anonymized pile of aggregate CPUs and RAM for many different types of work.  A non-exhaustive list of things I want to understand are:</p>
+
+<ul>
+<li>How are larger jobs broken down and parallelized?</li>
+<li>How are parts of jobs made to coexist in an environment of constantly changing demands?</li>
+<li>How do we ensure full utilization of extant resources and do we <em>need</em> to in a cloud environment as opposed to  simply scaling the resources?</li>
+<li>While I understand the basics of being concerned with &ldquo;data locality&rdquo; (get the computation as close as possible to the data), what are some practical ways to achieve this in a general way, applicable to many applications?</li>
+</ul>
+
+
+<p>In hopes of answering these (and other) questions, I started to compile this reading list of papers that seemed like they would help answer them.  An earlier form of this list was posted as a gist <a href="https://gist.github.com/j14159/19d100a556effacd1475">here</a>.</p>
+
+<p>At present I have completed the Google File System, MapReduce, and Microsoft Dryad papers, all of which I have thoroughly enjoyed reading and they have already contributed to a better understanding of how I should be approaching Spark.</p>
+
+<h1>The List</h1>
+
+<p>This list was built primarily by crawling through the references sections of a few different papers.  Some of these have come by way of suggestions from <a href="https://twitter.com/omarkj">Omar</a> and <a href="https://twitter.com/ook">Michael</a> as noted below.  In pursuit of a reasonable reading and study plan for myself, I tried to lay the material out in something of a logical path from early successes to more recent ideas and implementations.</p>
+
+<p>If you feel I&rsquo;ve left out anything particularly awesome or am incorrect in any assumptions/descriptions with respect to the later papers, I&rsquo;d love to hear about it and will update my list accordingly.</p>
+
+<h2>Fundamentals</h2>
+
+<p>A brief list of papers and ideas that I thought would give me something of a foundation in what the main problems, concerns, and early solutions were.</p>
+
+<ol>
+<li><a href="http://static.googleusercontent.com/media/research.google.com/en//archive/gfs-sosp2003.pdf">Google File System</a> &ndash; most of the later material references this paper and it seems like this enabled a lot of other ideas later on.  The distribution of chunks of a file around a cluster enables a lot of interesting data locality stuff.</li>
+<li><a href="http://static.googleusercontent.com/media/research.google.com/en//archive/mapreduce-osdi04.pdf">Google MapReduce</a> &ndash; a pretty lucid and well thought out divide-and-conquer approach to parallelizing a huge job.  The functional programming part of me loved the LISP shout-out/inspiration.</li>
+<li><a href="http://research.microsoft.com/en-us/projects/dryad/eurosys07.pdf">Dryad</a> for a more fine-grained/raw approach to programming against a cluster.</li>
+<li><a href="http://www.sigops.org/sosp/sosp09/papers/isard-sosp09.pdf">Quincy</a> is, from what I understand so far, a more detailed look at an alternative scheduler for Dryad.</li>
+<li><a href="http://people.csail.mit.edu/matei/papers/2010/eurosys_delay_scheduling.pdf">Delay Scheduling</a> for a detailed look at a different Hadoop scheduler.  Note the involvement of <a href="https://twitter.com/matei_zaharia">Matei Zaharia</a> who later worked on both the Mesos and Spark projects.</li>
+</ol>
+
+
+<h2>Cluster Schedulers</h2>
+
+<p>Just the two big ones here, unfortunately there don&rsquo;t seem to be any papers out there on Google&rsquo;s Borg project.</p>
+
+<ol>
+<li><a href="http://people.csail.mit.edu/matei/papers/2011/nsdi_mesos.pdf">Mesos</a> as mentioned above is what I currently use to manage Spark resources.</li>
+<li><a href="http://eurosys2013.tudos.org/wp-content/uploads/2013/paper/Schwarzkopf.pdf">Omega</a> is (was?) a project whose aim is/was to fix shortcomings in Google&rsquo;s existing cluster scheduling/management system (assuming Borg).</li>
+</ol>
+
+
+<h2>More Programming Models</h2>
+
+<ol>
+<li><a href="https://www.usenix.org/legacy/event/osdi08/tech/full_papers/yu_y/yu_y.pdf">DryadLINQ</a> is a higher-level programming model built on top of Dryad.  Composition FTW.</li>
+<li><a href="http://kowshik.github.io/JPregel/pregel_paper.pdf">Pregel</a> a graph processing paper from Google.  References Dryad as well but I&rsquo;m not sure how close it is as I haven&rsquo;t read it yet and it seems to be less about dataflow.</li>
+<li><a href="http://db.cs.berkeley.edu/papers/nsdi10-hop.pdf">MapReduce Online</a> for an iterative MapReduce.</li>
+<li><a href="http://vldb.org/pvldb/vol5/p716_yuchenglow_vldb2012.pdf">Distributed GraphLab</a> sounds like another graph-like computation model but one that embraces asynchrony and parallelism a bit more.  Possibly belongs in the next category but I&rsquo;m not sure yet.</li>
+</ol>
+
+
+<h2>Data Flow</h2>
+
+<ol>
+<li><a href="http://static.googleusercontent.com/media/research.google.com/en//pubs/archive/41378.pdf">MillWheel</a> as recommended by <a href="https://twitter.com/omarkj">Omar</a> talks about stream processing but does appear to tackle the problem with a form of computation graph that looks like a dataflow approach.</li>
+<li><a href="http://sigops.org/sosp/sosp13/papers/p439-murray.pdf">Naiad</a> is relatively recent from Microsoft Research (2013) and intriguingly mentions &ldquo;cyclic dataflow&rdquo; (also via <a href="https://twitter.com/omarkj">Omar</a>).</li>
+<li><a href="https://www.info.ucl.ac.be/~pvr/erlang14cameraready.pdf">Derflow</a> is about &ldquo;deterministic dataflow&rdquo; with Erlang.  Sounds too good to pass up.</li>
+</ol>
+
+
+<h2>Big Ideas</h2>
+
+<ol>
+<li><a href="http://research.cs.wisc.edu/htcondor/doc/condor-practice.pdf">Condor</a> is referenced both by MapReduce and Dryad as an inspiration for cluster management approaches so I&rsquo;ve added it to get a bit more perspective at the end.</li>
+<li><a href="http://www.morganclaypool.com/doi/pdf/10.2200/S00193ED1V01Y200905CAC006">The Datacenter as a Computer</a> (thanks to <a href="https://twitter.com/ook">Michael</a> for the reminder) is a bit over 100 pages but seems to cover a lot more of Google&rsquo;s general approach to clusters and more.</li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/blog/2015/01/14/ix-and-the-throughput-slash-latency-tradeoff/">IX and the Throughput/latency Tradeoff</a></h1>
     
     
@@ -147,6 +251,20 @@
 <p>I&rsquo;m going to try to apply this same sort of approach for simpler base concepts.  I think it&rsquo;s roughly in line with the <a href="http://www.scotthyoung.com/learnonsteroids/grab/TranscriptFeynman.pdf">Feynman technique</a> albeit simplified for the moment perhaps.</p>
 
 <p>If you disagree with my definition with respect to the IX paper, I&rsquo;d love to hear about it.  As mentioned I&rsquo;ve only skimmed the paper so far and so it&rsquo;s entirely likely my definition and/or understanding will change a bit as I dig in deeper.</p>
+
+<h1>Update</h1>
+
+<p>Thanks to <a href="https://twitter.com">Saem</a> poking holes in the above definition, I&rsquo;ve started to refine it a bit.  The primary issue he turned up is that nowhere did I specify a cost for the interruptions required by latency and this further turned up an error in my definition of latency.  I&rsquo;ve adjusted the definition of latency and the tradeoff as follows:</p>
+
+<h2>Latency</h2>
+
+<p>Is a measure of the time from submission of work until some acknowledgement that the work is proceeding.  Servicing latency requires a non-zero amount of work because the expected minimum of the acknowledgement itself is work.</p>
+
+<p>Note that this definition is primarily concerned with responsiveness rather than completeness of the submitted work and that latency consumes some measure of available throughput since it requires work.</p>
+
+<h2>The Tradeoff</h2>
+
+<p>A system with a limited capacity to do work, like a computer, is one with a bounded or static throughput.  In order for this system to provide the lowest possible latency, it must be able to interrupt existing work without restriction and consume throughput for <em>at least</em> acknowledgement of the receipt of new work.  On the other hand, to provide the highest possible throughput the system must prevent interruptions that also wish to consume its limited resource in favour of any existing work&rsquo;s use of it.</p>
 </div>
   
   
@@ -1104,6 +1222,10 @@ Lastly, I&rsquo;ll welcome feedback and optimization suggestions(with credit giv
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/02/28/cluster-reading-list/">Cluster Reading List</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/01/14/ix-and-the-throughput-slash-latency-tradeoff/">IX and the Throughput/latency Tradeoff</a>
       </li>
     
@@ -1117,10 +1239,6 @@ Lastly, I&rsquo;ll welcome feedback and optimization suggestions(with credit giv
     
       <li class="post">
         <a href="/blog/2013/03/09/espacewar-open-sourced/">eSpacewar Open Sourced</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/03/02/testing-erlang-spacewar/">Testing Erlang Spacewar</a>
       </li>
     
   </ul>
