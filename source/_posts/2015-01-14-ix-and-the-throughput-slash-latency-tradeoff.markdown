@@ -38,3 +38,15 @@ In a cooperative system, the balance is struck by yielding control after an alot
 I'm going to try to apply this same sort of approach for simpler base concepts.  I think it's roughly in line with the [Feynman technique](http://www.scotthyoung.com/learnonsteroids/grab/TranscriptFeynman.pdf) albeit simplified for the moment perhaps.
 
 If you disagree with my definition with respect to the IX paper, I'd love to hear about it.  As mentioned I've only skimmed the paper so far and so it's entirely likely my definition and/or understanding will change a bit as I dig in deeper.
+
+# Update
+
+Thanks to [Saem](https://twitter.com) poking holes in the above definition, I've started to refine it a bit.  The primary issue he turned up is that nowhere did I specify a cost for the interruptions required by latency and this further turned up an error in my definition of latency.  I've adjusted the definition of latency and the tradeoff as follows:
+
+## Latency
+Is a measure of the time from submission of work until some acknowledgement that the work is proceeding.  Servicing latency requires a non-zero amount of work because the expected minimum of the acknowledgement itself is work.
+
+Note that this definition is primarily concerned with responsiveness rather than completeness of the submitted work and that latency consumes some measure of available throughput since it requires work.
+
+## The Tradeoff
+A system with a limited capacity to do work, like a computer, is one with a bounded or static throughput.  In order for this system to provide the lowest possible latency, it must be able to interrupt existing work without restriction and consume throughput for *at least* acknowledgement of the receipt of new work.  On the other hand, to provide the highest possible throughput the system must prevent interruptions that also wish to consume its limited resource in favour of any existing work's use of it.
