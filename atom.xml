@@ -4,7 +4,7 @@
   <title><![CDATA[NoisyCode]]></title>
   <link href="http://noisycode.com/atom.xml" rel="self"/>
   <link href="http://noisycode.com/"/>
-  <updated>2015-02-28T16:14:50-08:00</updated>
+  <updated>2015-03-13T08:06:04-07:00</updated>
   <id>http://noisycode.com/</id>
   <author>
     <name><![CDATA[Jeremy Pierre]]></name>
@@ -12,6 +12,45 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Recent Influences]]></title>
+    <link href="http://noisycode.com/blog/2015/03/12/recent-influences/"/>
+    <updated>2015-03-12T15:47:37-07:00</updated>
+    <id>http://noisycode.com/blog/2015/03/12/recent-influences</id>
+    <content type="html"><![CDATA[<p>Over a lunch the other day with <a href="https://twitter.com/agonigberg">Arthur</a> I let fly a number of references that I&rsquo;m sure I&rsquo;ve mentioned to others as well, and thought I should collect a few of them in one place.  Some of these talks, posts, and books are more recent than others but collectively they are some of the bigger influences on my developing view of what constitutes &ldquo;professionalism&rdquo; and generally improving some different aspects my life.  I&rsquo;ve tried to give credit to the people from whom I saw them where I remember.</p>
+
+<p>By no means is this a complete list, it&rsquo;s simply those pieces that immediately came to mind as being influential for me within the last couple of years.</p>
+
+<h2>On Being A Senior Engineer</h2>
+
+<p>If memory serves, I first saw <a href="http://www.kitchensoap.com/2012/10/25/on-being-a-senior-engineer/">John Allspaw&rsquo;s post</a> mentioned in a tweet from <a href="https://twitter.com/coda">Coda Hale</a>.  My first reading was the cause of some immediate and serious introspection as I compared how I acted when first holding this title against Allspaw&rsquo;s ideal and found myself wanting.  Much of what is in his post is the current foundation of what I would consider to be professionalism and definitely contributes to some aspirational goals.</p>
+
+<h2>Death By 1000 Paper Cuts</h2>
+
+<p>I don&rsquo;t recall where I first saw <a href="http://juliepagano.tumblr.com/post/46206589124/my-experiences-in-tech-death-by-1000-paper-cuts">Julie Pagano&rsquo;s post</a> but it&rsquo;s one that made me start watching how I interact with my different communities, work included.  This was an excellent prompt for me to start examining how my approach at any given point is harming or helping the people around me.  I still have a lot of room for improvement but this was a great beginning kick in the ass.</p>
+
+<h2>Leaders Eat Last</h2>
+
+<p><a href="https://www.youtube.com/watch?v=ReRcHdeUG9Y">Simon Sinek&rsquo;s talk</a> (he has a <a href="http://www.amazon.ca/Leaders-Eat-Last-Together-Others/dp/1591845327">book</a> by the same name that I&rsquo;ve not yet read) was recommended to me by <a href="https://twitter.com/tylerweir">Tyler</a>.  The way Sinek explains what <em>makes</em> a leader and connects that into how we form groups and work together most efficiently is what initially struck me.  Tying the workings of our our brain chemistry into our interactions also changed some of my thinking about how to better support and participate in the various communities I value.  I&rsquo;ve worked in the dysfunctional type of organization he describes and I want to work in and build the opposite.</p>
+
+<h2>Aurelius&#8217; Meditations</h2>
+
+<p>A fairly well known book that I&rsquo;ll likely be re-reading every year or two for the rest of my life.  The main impacts my first reading had were making me more aware of my frustrated reactions and even anger, helping me manage them and better understand what actually matters.  The results (aided by my <a href="http://noisycode.com/blog/2014/12/07/becoming-better/">notebook system</a> for reflection) have been less fundamentally irrelevant frustration and better focus.  A large part of what Aurelius seemed to be struggling with in my first reading was finding balance with all of the different people and pressures surrounding him.  The <a href="http://www.amazon.ca/exec/obidos/ASIN/0812968255/farst-20">translation I read</a> was introduced to me by the <a href="http://farnamstreetblog.com">Farnam Street blog</a> &ndash; that Amazon link is an affiliate one for the blog (thanks to <a href="https://twitter.com/tylerweir">Tyler</a> for introducing me to Farnam Street).</p>
+
+<h2>Speaking While Female</h2>
+
+<p><a href="http://www.nytimes.com/2015/01/11/opinion/sunday/speaking-while-female.html">This NYT piece</a> has made me much more cognizant of how much I interrupt people and I&rsquo;m trying to rein this in.  I&rsquo;m not actually <em>participating</em> in a community if all I do is broadcast my opinion and try to talk over people.</p>
+
+<h2>Burnout and Ops</h2>
+
+<p><a href="https://www.usenix.org/conference/lisa14/conference-program/presentation/lehtonen">This presentation</a> from <a href="https://twitter.com/alrs">Lars Lehtonen</a> probably deserves watching a few times.  This one is <em>fantastic</em> for getting some perspective on what&rsquo;s actually valuable.  I&rsquo;m not sure who exactly I saw reference this at first but it was definitely one of <a href="https://twitter.com/randomfrequency">Vince</a>, <a href="https://twitter.com/wrathofchris">Chris</a>, or <a href="https://twitter.com/ook">Michael</a>.</p>
+
+<h2>Keeping Reasonable Hours</h2>
+
+<p><a href="http://www.alternet.org/story/154518/why_we_have_to_go_back_to_a_40-hour_work_week_to_keep_our_sanity">This post</a> was a prompt to consider two things:  what is actually valuable to me, and how can I focus on being more efficient and effective?  Since restricting the volume of hours I spend <em>directly</em> on work and bursting only when necessary, my effectiveness definitely seems to have increased.  It leaves more time for my brain to recuperate, my relationships (which also provide a form of recovery), and for me to work on generally improving things related to my career (e.g. reading computer science papers) and personal life.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Cluster Reading List]]></title>
