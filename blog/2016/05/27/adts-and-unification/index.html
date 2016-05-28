@@ -5,11 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>IX and the Throughput/latency Tradeoff - NoisyCode</title>
+  <title>ADTs and Unification - NoisyCode</title>
   <meta name="author" content="Jeremy Pierre">
 
   
-  <meta name="description" content="Since Saem put me onto the Coursera &ldquo;Learning How To Learn&rdquo; course and Tavis (as well as Tyler iirc) pointed me at Scott Young, I&rsquo; &hellip;">
+  <meta name="description" content="I&rsquo;ve been tinkering with a statically-typed language for the Erlang VM for the
+past few months, up until recently little more than an ML-shaped &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +19,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://noisycode.com/blog/2015/01/14/ix-and-the-throughput-slash-latency-tradeoff">
+  <link rel="canonical" href="http://noisycode.com/blog/2016/05/27/adts-and-unification">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="NoisyCode" type="application/atom+xml">
@@ -81,7 +82,7 @@
   
   <header>
     
-      <h1 class="entry-title">IX and the Throughput/latency Tradeoff</h1>
+      <h1 class="entry-title">ADTs and Unification</h1>
     
     
       <p class="meta">
@@ -97,67 +98,137 @@
   
 
 
-<time datetime="2015-01-14T19:22:22-08:00" pubdate data-updated="true">Jan 14<sup>th</sup>, 2015</time>
+<time datetime="2016-05-27T18:44:16-07:00" pubdate data-updated="true">May 27<sup>th</sup>, 2016</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>Since <a href="https://twitter.com/saemg">Saem</a> put me onto the Coursera <a href="https://class.coursera.org/learning-003">&ldquo;Learning How To Learn&rdquo;</a> course and <a href="https://twitter.com/tavisrudd">Tavis</a> (as well as <a href="https://twitter.com/tylerweir">Tyler</a> iirc) pointed me at <a href="http://www.scotthyoung.com/blog/">Scott Young</a>, I&rsquo;ve been trying to figure out how to better approach learning all of the material I try to throw at myself.</p>
+<div class="entry-content"><p>I&rsquo;ve been tinkering with a statically-typed language for the Erlang VM for the
+past few months, up until recently little more than an ML-shaped front for
+Core Erlang with a type inferencer and incomplete support for basic Erlang
+stuff.  Before fleshing out some of the required bits (like binaries), I&rsquo;m
+working through implementing simple abstract data types.  I&rsquo;m aiming for
+something roughly analogous to OCaml&rsquo;s variants or Haskell&rsquo;s GADTs.  Essentially
+I want something like the following to work:</p>
 
-<p>This coming Monday for the <a href="https://plus.google.com/u/0/communities/110886264051164890990">Polyglot reading group</a> we&rsquo;re covering the <a href="https://www.usenix.org/conference/osdi14/technical-sessions/presentation/belay">IX protected dataplane OS</a> <a href="https://www.usenix.org/system/files/conference/osdi14/osdi14-paper-belay.pdf">paper</a> which describes a set of tradeoffs that operating systems must make when deciding how to handle IO (network in this case).</p>
+<pre><code>type my_list 'x = Nil | Cons ('x, my_list 'x)
+</code></pre>
 
-<p>While initially skimming the paper to try to figure out how I might chunk it to build a more cohesive understanding, I realized that I had an intuitive grip on the tradeoff between throughput and latency but I&rsquo;d never tried to properly define it for myself.  Being able to clearly define something I think is a mark of actual understanding and builds the ability to leverage it.  I figured this would be a good exercise in that spirit and both Dr Oakley and Scott Young seem to agree from what I&rsquo;ve seen so far.</p>
+<p>but also:</p>
 
-<h1>My Attempt</h1>
+<pre><code>type json_subset =  int
+                  | string
+                  | (string, json_subset)
+                  | Array (list json_subset)
+</code></pre>
 
-<p>Describe throughput, latency, and the tradeoff between them as generally as possible but with a view to how they pertain to the IX paper.</p>
+<p>It&rsquo;s the latter that makes type unification a bit squirelly and this post is
+mostly thinking through how I&rsquo;m going to attempt it at first.  It&rsquo;s entirely
+possible I don&rsquo;t fully understand the problem I&rsquo;m trying to tackle yet but as
+this entire project is an attempt to better understand type inference and
+checking I&rsquo;m pretty OK with that.</p>
 
-<h2>Throughput</h2>
-
-<p>Is a measure of how much <em>uninterrupted</em> work can be done.</p>
-
-<h2>Latency</h2>
-
-<p>Is a measure of how long it takes from submission of some work until its completion.</p>
-
-<p>I think &ldquo;submission&rdquo; is likely interchangeable with any of the following if you prefer:</p>
+<p>For clarity, the unification function gets called currently in the following
+situations:</p>
 
 <ul>
-<li>definition</li>
-<li>creation</li>
-<li>identification</li>
+<li>for items being cons&rsquo;d together into a list</li>
+<li>across all pattern match clauses to type the match (all patterns must unify
+with each other, all result types must unify as well)</li>
+<li>inside each clause to ensure the types forced by guard functions match the
+types in the result expression</li>
+<li>inside each guard, sort of a special case of function application that I can
+likely generalize better.</li>
+<li>Erlang FFI returns.  These look like pattern matches but only the result
+portion of each clause is checked.</li>
+<li>function application.</li>
 </ul>
 
 
-<h2>The Tradeoff</h2>
+<p>A cleaner example to describe the problem is based on the following types:</p>
 
-<p>In a system with limited capacity to do work, latency is proportional to the ability to interrupt existing work.  If interruption of current work is <em>not</em> permitted, meaning existing work proceeds with <em>no breaks</em>, the latency is equivalent to the time it takes to complete the pre-existing work because the system cannot do the new work until it finishes the <em>existing</em> work.  If interruptions <em>are</em> permitted without restriction, throughput is entirely bound by the frequency of interruptions.</p>
+<pre><code>type t = int | A int
+type u = int | float
+type v = int | float | (string, float)
+</code></pre>
 
-<p>In a system that preempts work, the balance is struck by limiting the frequency of interruptions.</p>
+<p>Inferencing of basic matches already works, e.g.</p>
 
-<p>In a cooperative system, the balance is struck by yielding control after an alotted amount of work is done (note that this depends on altruistic workers).</p>
+<pre><code>f x = match x with
+    0 -&gt; :zero
+  | 1 -&gt; :one
+  | _ -&gt; :more_than_one
+</code></pre>
 
-<h1>Next</h1>
+<p>will type to <code>{t_arrow, [{t_int}], t_atom}</code> meaning &ldquo;a function from integers to
+atoms&rdquo;.  What I&rsquo;d like is for</p>
 
-<p>I&rsquo;m going to try to apply this same sort of approach for simpler base concepts.  I think it&rsquo;s roughly in line with the <a href="http://www.scotthyoung.com/learnonsteroids/grab/TranscriptFeynman.pdf">Feynman technique</a> albeit simplified for the moment perhaps.</p>
+<pre><code>f x = match x with
+    i, is_integer i -&gt; :int
+  | A _             -&gt; :got_an_A
+</code></pre>
 
-<p>If you disagree with my definition with respect to the IX paper, I&rsquo;d love to hear about it.  As mentioned I&rsquo;ve only skimmed the paper so far and so it&rsquo;s entirely likely my definition and/or understanding will change a bit as I dig in deeper.</p>
+<p>to type to <code>{t_arrow, [{t_adt, "t"}], t_atom}</code> but this won&rsquo;t be too hard
+either.</p>
 
-<h1>Update</h1>
+<p>The following is a little more difficult:</p>
 
-<p>Thanks to <a href="https://twitter.com">Saem</a> poking holes in the above definition, I&rsquo;ve started to refine it a bit.  The primary issue he turned up is that nowhere did I specify a cost for the interruptions required by latency and this further turned up an error in my definition of latency.  I&rsquo;ve adjusted the definition of latency and the tradeoff as follows:</p>
+<pre><code>f x = match x with
+    i, is_integer i                 -&gt; :int_but_could_be_one_of_three_types
+  | f, is_float f                   -&gt; :could_be_u_or_v
+  | (s, f), is_string s, is_float f -&gt; :definitely_v
+</code></pre>
 
-<h2>Latency</h2>
+<p>The first two clauses (when unified) are shaped like a <code>u</code> while the third makes
+it a <code>v</code>.  Unification works by trying to unify only two types at a time at
+present so in a naive implementation the first and second clauses will unify to
+<code>{t_arrow, [{t_adt, "u"}], t_atom}</code> and the third will cause a unification
+failure because there is no type encapsulating <code>u</code> and <code>v</code>.  I think I&rsquo;ve got
+two options, aside from saying &ldquo;reorder your clauses&rdquo;:</p>
 
-<p>Is a measure of the time from submission of work until some acknowledgement that the work is proceeding.  Servicing latency requires a non-zero amount of work because the expected minimum of the acknowledgement itself is work.</p>
+<ol>
+<li>Rework <code>unify</code> to take a list of expressions instead of two.</li>
+<li>Require a union type covering <code>v</code> and <code>u</code> in order to type</li>
+</ol>
 
-<p>Note that this definition is primarily concerned with responsiveness rather than completeness of the submitted work and that latency consumes some measure of available throughput since it requires work.</p>
 
-<h2>The Tradeoff</h2>
+<p>I think #1 is better (&ldquo;just works&rdquo;) but I think I&rsquo;m going to choose #2 as at
+moment the list of problems to solve before opening up the source is a bit nasty,
+including but not limited to:</p>
 
-<p>A system with a limited capacity to do work, like a computer, is one with a bounded or static throughput.  In order for this system to provide the lowest possible latency, it must be able to interrupt existing work without restriction and consume throughput for <em>at least</em> acknowledgement of the receipt of new work.  On the other hand, to provide the highest possible throughput the system must prevent interruptions that also wish to consume its limited resource in favour of any existing work&rsquo;s use of it.</p>
+<ul>
+<li>type errors are nothing more than <code>{error, {cannot_unify, Type1, Type2}}</code> and
+don&rsquo;t even include a line number.  &ldquo;User-hostile&rdquo; is an understatement.</li>
+<li>documentation and testing facilities are nonexistent.  I&rsquo;ve got some
+particular directions I want to go with both (mostly selfish learning stuff)
+before I take the lid off.</li>
+<li>a truly scary number of dialyzer errors.  That my type-checking language
+doesn&rsquo;t type-check is a source of mild amusement for me at the moment.</li>
+<li>pretty much zero support for compiling anything but a list of files.</li>
+<li>some trivial-to-implement stuff like sending and receiving messages.</li>
+<li>haven&rsquo;t even begun to tackle strings-vs-lists, etc.</li>
+</ul>
+
+
+<p>I&rsquo;ll probably make the repository public once at least the first three items of the above
+list are done as right now those are the bits I&rsquo;m most embarassed about.</p>
+
+<p>Extra bits for the curious:</p>
+
+<ul>
+<li>implemented using <a href="http://erlang.org/doc/man/leex.html">leex</a> and
+<a href="http://erlang.org/doc/man/yecc.html">yecc</a> with the <code>cerl</code> and <code>compile</code>
+modules to create Core Erlang ASTs and generate <code>.beam</code> files respectively.</li>
+<li>has a basic FFI to Erlang, I haven&rsquo;t yet tried calling dializer so it requires
+a set of clauses to type the result.</li>
+<li>type checker was based initially on
+<a href="http://okmij.org/ftp/ML/generalization.html">How OCaml type checker works</a>.</li>
+<li>not much of a design behind the language at the moment.  Bits of syntax come
+from Haskell, OCaml, and Elm at the moment.  It&rsquo;s grown as I&rsquo;ve learned.</li>
+</ul>
+
 </div>
 
 
@@ -180,12 +251,12 @@
   
 
 
-<time datetime="2015-01-14T19:22:22-08:00" pubdate data-updated="true">Jan 14<sup>th</sup>, 2015</time>
+<time datetime="2016-05-27T18:44:16-07:00" pubdate data-updated="true">May 27<sup>th</sup>, 2016</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/learning/'>learning</a>
+    <a class='category' href='/blog/categories/compiler/'>compiler</a>, <a class='category' href='/blog/categories/types/'>types</a>
   
 </span>
 
@@ -194,7 +265,7 @@
     
       <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://noisycode.com/blog/2015/01/14/ix-and-the-throughput-slash-latency-tradeoff/" data-via="j14159" data-counturl="http://noisycode.com/blog/2015/01/14/ix-and-the-throughput-slash-latency-tradeoff/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://noisycode.com/blog/2016/05/27/adts-and-unification/" data-via="j14159" data-counturl="http://noisycode.com/blog/2016/05/27/adts-and-unification/" >Tweet</a>
   
   
   
@@ -203,10 +274,8 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2014/12/07/becoming-better/" title="Previous Post: Becoming Better">&laquo; Becoming Better</a>
+        <a class="basic-alignment left" href="/blog/2015/03/12/recent-influences/" title="Previous Post: Recent Influences">&laquo; Recent Influences</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2015/02/28/cluster-reading-list/" title="Next Post: Cluster Reading List">Cluster Reading List &raquo;</a>
       
     </p>
   </footer>
@@ -326,8 +395,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://noisycode.com/blog/2015/01/14/ix-and-the-throughput-slash-latency-tradeoff/';
-        var disqus_url = 'http://noisycode.com/blog/2015/01/14/ix-and-the-throughput-slash-latency-tradeoff/';
+        var disqus_identifier = 'http://noisycode.com/blog/2016/05/27/adts-and-unification/';
+        var disqus_url = 'http://noisycode.com/blog/2016/05/27/adts-and-unification/';
         var disqus_script = 'embed.js';
       
     (function () {

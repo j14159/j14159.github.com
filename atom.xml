@@ -4,7 +4,7 @@
   <title><![CDATA[NoisyCode]]></title>
   <link href="http://noisycode.com/atom.xml" rel="self"/>
   <link href="http://noisycode.com/"/>
-  <updated>2015-03-24T08:42:22-07:00</updated>
+  <updated>2016-05-27T19:43:29-07:00</updated>
   <id>http://noisycode.com/</id>
   <author>
     <name><![CDATA[Jeremy Pierre]]></name>
@@ -12,6 +12,138 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[ADTs and Unification]]></title>
+    <link href="http://noisycode.com/blog/2016/05/27/adts-and-unification/"/>
+    <updated>2016-05-27T18:44:16-07:00</updated>
+    <id>http://noisycode.com/blog/2016/05/27/adts-and-unification</id>
+    <content type="html"><![CDATA[<p>I&rsquo;ve been tinkering with a statically-typed language for the Erlang VM for the
+past few months, up until recently little more than an ML-shaped front for
+Core Erlang with a type inferencer and incomplete support for basic Erlang
+stuff.  Before fleshing out some of the required bits (like binaries), I&rsquo;m
+working through implementing simple abstract data types.  I&rsquo;m aiming for
+something roughly analogous to OCaml&rsquo;s variants or Haskell&rsquo;s GADTs.  Essentially
+I want something like the following to work:</p>
+
+<pre><code>type my_list 'x = Nil | Cons ('x, my_list 'x)
+</code></pre>
+
+<p>but also:</p>
+
+<pre><code>type json_subset =  int
+                  | string
+                  | (string, json_subset)
+                  | Array (list json_subset)
+</code></pre>
+
+<p>It&rsquo;s the latter that makes type unification a bit squirelly and this post is
+mostly thinking through how I&rsquo;m going to attempt it at first.  It&rsquo;s entirely
+possible I don&rsquo;t fully understand the problem I&rsquo;m trying to tackle yet but as
+this entire project is an attempt to better understand type inference and
+checking I&rsquo;m pretty OK with that.</p>
+
+<p>For clarity, the unification function gets called currently in the following
+situations:</p>
+
+<ul>
+<li>for items being cons&rsquo;d together into a list</li>
+<li>across all pattern match clauses to type the match (all patterns must unify
+with each other, all result types must unify as well)</li>
+<li>inside each clause to ensure the types forced by guard functions match the
+types in the result expression</li>
+<li>inside each guard, sort of a special case of function application that I can
+likely generalize better.</li>
+<li>Erlang FFI returns.  These look like pattern matches but only the result
+portion of each clause is checked.</li>
+<li>function application.</li>
+</ul>
+
+
+<p>A cleaner example to describe the problem is based on the following types:</p>
+
+<pre><code>type t = int | A int
+type u = int | float
+type v = int | float | (string, float)
+</code></pre>
+
+<p>Inferencing of basic matches already works, e.g.</p>
+
+<pre><code>f x = match x with
+    0 -&gt; :zero
+  | 1 -&gt; :one
+  | _ -&gt; :more_than_one
+</code></pre>
+
+<p>will type to <code>{t_arrow, [{t_int}], t_atom}</code> meaning &ldquo;a function from integers to
+atoms&rdquo;.  What I&rsquo;d like is for</p>
+
+<pre><code>f x = match x with
+    i, is_integer i -&gt; :int
+  | A _             -&gt; :got_an_A
+</code></pre>
+
+<p>to type to <code>{t_arrow, [{t_adt, "t"}], t_atom}</code> but this won&rsquo;t be too hard
+either.</p>
+
+<p>The following is a little more difficult:</p>
+
+<pre><code>f x = match x with
+    i, is_integer i                 -&gt; :int_but_could_be_one_of_three_types
+  | f, is_float f                   -&gt; :could_be_u_or_v
+  | (s, f), is_string s, is_float f -&gt; :definitely_v
+</code></pre>
+
+<p>The first two clauses (when unified) are shaped like a <code>u</code> while the third makes
+it a <code>v</code>.  Unification works by trying to unify only two types at a time at
+present so in a naive implementation the first and second clauses will unify to
+<code>{t_arrow, [{t_adt, "u"}], t_atom}</code> and the third will cause a unification
+failure because there is no type encapsulating <code>u</code> and <code>v</code>.  I think I&rsquo;ve got
+two options, aside from saying &ldquo;reorder your clauses&rdquo;:</p>
+
+<ol>
+<li>Rework <code>unify</code> to take a list of expressions instead of two.</li>
+<li>Require a union type covering <code>v</code> and <code>u</code> in order to type</li>
+</ol>
+
+
+<p>I think #1 is better (&ldquo;just works&rdquo;) but I think I&rsquo;m going to choose #2 as at
+moment the list of problems to solve before opening up the source is a bit nasty,
+including but not limited to:</p>
+
+<ul>
+<li>type errors are nothing more than <code>{error, {cannot_unify, Type1, Type2}}</code> and
+don&rsquo;t even include a line number.  &ldquo;User-hostile&rdquo; is an understatement.</li>
+<li>documentation and testing facilities are nonexistent.  I&rsquo;ve got some
+particular directions I want to go with both (mostly selfish learning stuff)
+before I take the lid off.</li>
+<li>a truly scary number of dialyzer errors.  That my type-checking language
+doesn&rsquo;t type-check is a source of mild amusement for me at the moment.</li>
+<li>pretty much zero support for compiling anything but a list of files.</li>
+<li>some trivial-to-implement stuff like sending and receiving messages.</li>
+<li>haven&rsquo;t even begun to tackle strings-vs-lists, etc.</li>
+</ul>
+
+
+<p>I&rsquo;ll probably make the repository public once at least the first three items of the above
+list are done as right now those are the bits I&rsquo;m most embarassed about.</p>
+
+<p>Extra bits for the curious:</p>
+
+<ul>
+<li>implemented using <a href="http://erlang.org/doc/man/leex.html">leex</a> and
+<a href="http://erlang.org/doc/man/yecc.html">yecc</a> with the <code>cerl</code> and <code>compile</code>
+modules to create Core Erlang ASTs and generate <code>.beam</code> files respectively.</li>
+<li>has a basic FFI to Erlang, I haven&rsquo;t yet tried calling dializer so it requires
+a set of clauses to type the result.</li>
+<li>type checker was based initially on
+<a href="http://okmij.org/ftp/ML/generalization.html">How OCaml type checker works</a>.</li>
+<li>not much of a design behind the language at the moment.  Bits of syntax come
+from Haskell, OCaml, and Elm at the moment.  It&rsquo;s grown as I&rsquo;ve learned.</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Recent Influences]]></title>

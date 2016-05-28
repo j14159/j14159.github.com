@@ -9,7 +9,8 @@
   <meta name="author" content="Jeremy Pierre">
 
   
-  <meta name="description" content="Over a lunch the other day with Arthur I let fly a number of references that I&rsquo;m sure I&rsquo;ve mentioned to others as well, and thought I &hellip;">
+  <meta name="description" content="I&rsquo;ve been tinkering with a statically-typed language for the Erlang VM for the
+past few months, up until recently little more than an ML-shaped &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +79,165 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2016/05/27/adts-and-unification/">ADTs and Unification</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-05-27T18:44:16-07:00" pubdate data-updated="true">May 27<sup>th</sup>, 2016</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I&rsquo;ve been tinkering with a statically-typed language for the Erlang VM for the
+past few months, up until recently little more than an ML-shaped front for
+Core Erlang with a type inferencer and incomplete support for basic Erlang
+stuff.  Before fleshing out some of the required bits (like binaries), I&rsquo;m
+working through implementing simple abstract data types.  I&rsquo;m aiming for
+something roughly analogous to OCaml&rsquo;s variants or Haskell&rsquo;s GADTs.  Essentially
+I want something like the following to work:</p>
+
+<pre><code>type my_list 'x = Nil | Cons ('x, my_list 'x)
+</code></pre>
+
+<p>but also:</p>
+
+<pre><code>type json_subset =  int
+                  | string
+                  | (string, json_subset)
+                  | Array (list json_subset)
+</code></pre>
+
+<p>It&rsquo;s the latter that makes type unification a bit squirelly and this post is
+mostly thinking through how I&rsquo;m going to attempt it at first.  It&rsquo;s entirely
+possible I don&rsquo;t fully understand the problem I&rsquo;m trying to tackle yet but as
+this entire project is an attempt to better understand type inference and
+checking I&rsquo;m pretty OK with that.</p>
+
+<p>For clarity, the unification function gets called currently in the following
+situations:</p>
+
+<ul>
+<li>for items being cons&rsquo;d together into a list</li>
+<li>across all pattern match clauses to type the match (all patterns must unify
+with each other, all result types must unify as well)</li>
+<li>inside each clause to ensure the types forced by guard functions match the
+types in the result expression</li>
+<li>inside each guard, sort of a special case of function application that I can
+likely generalize better.</li>
+<li>Erlang FFI returns.  These look like pattern matches but only the result
+portion of each clause is checked.</li>
+<li>function application.</li>
+</ul>
+
+
+<p>A cleaner example to describe the problem is based on the following types:</p>
+
+<pre><code>type t = int | A int
+type u = int | float
+type v = int | float | (string, float)
+</code></pre>
+
+<p>Inferencing of basic matches already works, e.g.</p>
+
+<pre><code>f x = match x with
+    0 -&gt; :zero
+  | 1 -&gt; :one
+  | _ -&gt; :more_than_one
+</code></pre>
+
+<p>will type to <code>{t_arrow, [{t_int}], t_atom}</code> meaning &ldquo;a function from integers to
+atoms&rdquo;.  What I&rsquo;d like is for</p>
+
+<pre><code>f x = match x with
+    i, is_integer i -&gt; :int
+  | A _             -&gt; :got_an_A
+</code></pre>
+
+<p>to type to <code>{t_arrow, [{t_adt, "t"}], t_atom}</code> but this won&rsquo;t be too hard
+either.</p>
+
+<p>The following is a little more difficult:</p>
+
+<pre><code>f x = match x with
+    i, is_integer i                 -&gt; :int_but_could_be_one_of_three_types
+  | f, is_float f                   -&gt; :could_be_u_or_v
+  | (s, f), is_string s, is_float f -&gt; :definitely_v
+</code></pre>
+
+<p>The first two clauses (when unified) are shaped like a <code>u</code> while the third makes
+it a <code>v</code>.  Unification works by trying to unify only two types at a time at
+present so in a naive implementation the first and second clauses will unify to
+<code>{t_arrow, [{t_adt, "u"}], t_atom}</code> and the third will cause a unification
+failure because there is no type encapsulating <code>u</code> and <code>v</code>.  I think I&rsquo;ve got
+two options, aside from saying &ldquo;reorder your clauses&rdquo;:</p>
+
+<ol>
+<li>Rework <code>unify</code> to take a list of expressions instead of two.</li>
+<li>Require a union type covering <code>v</code> and <code>u</code> in order to type</li>
+</ol>
+
+
+<p>I think #1 is better (&ldquo;just works&rdquo;) but I think I&rsquo;m going to choose #2 as at
+moment the list of problems to solve before opening up the source is a bit nasty,
+including but not limited to:</p>
+
+<ul>
+<li>type errors are nothing more than <code>{error, {cannot_unify, Type1, Type2}}</code> and
+don&rsquo;t even include a line number.  &ldquo;User-hostile&rdquo; is an understatement.</li>
+<li>documentation and testing facilities are nonexistent.  I&rsquo;ve got some
+particular directions I want to go with both (mostly selfish learning stuff)
+before I take the lid off.</li>
+<li>a truly scary number of dialyzer errors.  That my type-checking language
+doesn&rsquo;t type-check is a source of mild amusement for me at the moment.</li>
+<li>pretty much zero support for compiling anything but a list of files.</li>
+<li>some trivial-to-implement stuff like sending and receiving messages.</li>
+<li>haven&rsquo;t even begun to tackle strings-vs-lists, etc.</li>
+</ul>
+
+
+<p>I&rsquo;ll probably make the repository public once at least the first three items of the above
+list are done as right now those are the bits I&rsquo;m most embarassed about.</p>
+
+<p>Extra bits for the curious:</p>
+
+<ul>
+<li>implemented using <a href="http://erlang.org/doc/man/leex.html">leex</a> and
+<a href="http://erlang.org/doc/man/yecc.html">yecc</a> with the <code>cerl</code> and <code>compile</code>
+modules to create Core Erlang ASTs and generate <code>.beam</code> files respectively.</li>
+<li>has a basic FFI to Erlang, I haven&rsquo;t yet tried calling dializer so it requires
+a set of clauses to type the result.</li>
+<li>type checker was based initially on
+<a href="http://okmij.org/ftp/ML/generalization.html">How OCaml type checker works</a>.</li>
+<li>not much of a design behind the language at the moment.  Bits of syntax come
+from Haskell, OCaml, and Elm at the moment.  It&rsquo;s grown as I&rsquo;ve learned.</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1126,156 +1286,9 @@ class PersonDao(cf: () =&gt; Connection) extends Actor {
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/10/21/pawnshop-in-which-i-learn-erlang-and-clojure-for-some-good/">Learning Erlang + Clojure for Some Good</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-10-21T17:22:00-07:00" pubdate data-updated="true">Oct 21<sup>st</sup>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>Background</h2>
-
-<p>Since pretty much everything I do at my <a href="http://twitter.com/hootsuite">day job</a> involves Akka and Scala, Erlang&rsquo;s been on my radar for quite a while.  Using RabbitMQ in current products and considering Riak to solve some nasty storage issues has of course heightened my interest in it as well.  Thanks to <a href="http://twitter.com/ujm">@ujm</a> and <a href="http://twitter.com/tavisrudd">@tavisrudd</a> I&rsquo;ve also been hearing a lot about Clojure for the past year or so and it has (not so) mysteriously turned up in a few testing tools at the aforementioned day job due to <a href="http://twitter.com/ujm">@ujm</a>&rsquo;s unbridled love for it.  As I&rsquo;ve been trying to improve my own approach to and understanding of functional programming, it seemed both natural and frankly exciting to dive into something involving both.</p>
-
-<h2>The Pitfall</h2>
-
-<p>This brings up a minor pet peeve of mine:  while evaluating something new and interesting, people often come up with trivial example projects and in the past, I&rsquo;ve been possibly more guilty than most.  This is something I want very much to avoid now.  The problems I&rsquo;ve seen in myself with using something <em>too</em> trivial to evaluate and learn new things are:</p>
-
-<ul>
-<li>performance assumptions are never grounded in reality when your code doesn&rsquo;t do anything realistic.  A perfect example is testing concurrent websocket connection limits that simply echo input (I did this with Play! 2.0 and I&rsquo;ve seen some naive numbers from the node.js crowd mentioned lately as well).</li>
-<li>simple projects rarely expose some of the strange corners of a language or platform.  Anyone who has extensively used Scala&rsquo;s implicits or made extensive use of futures and promises will understand this.</li>
-<li>most importantly overly trivial projects won&rsquo;t expose your <strong>own</strong> weaknesses and misunderstandings early on.</li>
-</ul>
-
-
-<h2>Some Goals</h2>
-
-<p>Given the above, there are a few specific challenges I&rsquo;m looking to work on with this project in both Erlang and Clojure:</p>
-
-<ul>
-<li>unique ID generation without a central locking resource.  I want to be able to establish total ordering without any central coordination.  <em>Loose</em> temporal ordering is a nice to have.</li>
-<li>horizontal scale, add and remove additional resources with no coordination required beyond some configuration.  As long as nodes can get in touch with the database, they should continue to function.</li>
-</ul>
-
-
-<p>And I have a few goals specific to Clojure and Erlang:</p>
-
-<ul>
-<li>learn to use their build tools (Leiningen and Rebar)</li>
-<li>loosen my reliance on object orientation</li>
-<li>get more comfortable with dynamic typing (I tend to yell a lot about the supremacy of static typing).</li>
-<li>experiment with a heterogeneous solution.  I&rsquo;ll be building the same thing in both languages so I think some interesting comparisons could arise with regard to things like deployment, configuration and performance.</li>
-</ul>
-
-
-<p>Naturally I&rsquo;m going to make a few rules for myself, the first and most important being that I&rsquo;m not going to hide my mistakes.  When I change my mind or screw up, all the details will be in the commit history.  Second, the whole thing will be open source so that anyone will be able to see my pace, changes and progress in github at any time.
-Lastly, I&rsquo;ll welcome feedback and optimization suggestions(with credit given where credit is due) but won&rsquo;t accept pull requests or massive rewrites from anyone &ndash; this is mine to learn and mess up.</p>
-
-<h2>The Actual Project</h2>
-
-<p>I&rsquo;m going to build a simple URL shortener and image hosting service called <a href="http://github.com/j14159/PawnShop">PawnShop</a> with the following basic features:</p>
-
-<ul>
-<li>exchange a URL for a short hash</li>
-<li>redirect short URLs to originals</li>
-<li>upload an image (png/jpeg) in return for a short hash</li>
-<li>redirect HTTP requests for a URL hash to the original</li>
-<li>display the matching submitted image for a given requested hash</li>
-<li>track click stats for each hash generated.  I&rsquo;ll store these at millisecond resolution.</li>
-<li>display hosted images inside a minimal template</li>
-<li>provide a REST API to retrieve click stats, likely report by one hour intervals at the smallest at first.</li>
-<li>basic authentication via email address and password</li>
-</ul>
-
-
-<p>The nice-to-have features will be:</p>
-
-<ul>
-<li>click stat reports/graphs with D3.js</li>
-<li>pluggable authentication</li>
-</ul>
-
-
-<p>The basic technical bits:</p>
-
-<ul>
-<li>This will be a single monolithic project, no interdependent services.</li>
-<li>It will be heterogeneous in that I want to be able to run the Erlang version side by side with the Clojure version in the same cluster, off the same database, behind the same load balancer and things should Just Work &trade;.</li>
-<li>I&rsquo;m going to use standard web frameworks, likely <a href="http://webnoir.org">Noir</a> and either <a href="http://chicagoboss.org">Chicago Boss</a> or <a href="http://nitrogenproject.com">Nitrogen</a></li>
-<li>The only data store I&rsquo;ll be using is Riak.</li>
-</ul>
-
-
-<h2>Following Along</h2>
-
-<p>I&rsquo;m going to aim for roughly a post-per-week here.  Blog posts related to PawnShop will essentially be a notebook/journal of my reasoning for certain decisions as well as both negative and positive experiences throughout the learning and development process.</p>
-
-<p><a href="http://github.com/j14159/PawnShop"><strong>GitHub</strong></a></p>
-
-<p><a href="https://trello.com/board/pawnshop/5084584abfe3e0931a00fdce"><strong>Trello</strong></a></p>
-
-<h2>Riak and the Data Model</h2>
-
-<p>A while ago, <a href="http://twitter.com/jamesgolick">@jamesgolick</a> told me I wasn&rsquo;t allowed to use Riak until I had read the famous Dynamo paper in its entirety.  He&rsquo;s right, and you should <a href="http://s3.amazonaws.com/AllThingsDistributed/sosp/amazon-dynamo-sosp2007.pdf">read it too</a> if you haven&rsquo;t yet.</p>
-
-<p>A URL shortener model seems a great fit for an eventually consistent Dynamo-style store like Riak.</p>
-
-<ul>
-<li>To shorten URLs and host pictures, you want high consistency for DB writes meaning that when a user submits new data, you want the write to complete with reasonable certainty.</li>
-<li>To retrieve URLs, low read consistency (small quorum) is OK.  Since we&rsquo;re not <strong>mutating</strong> URL and picture entries, we don&rsquo;t have to worry about an update that might not have hit replicas yet.</li>
-<li>To add and retrieve click stats, low read and write consistency is fine.  Missing one or two clicks out of thousands for a single report isn&rsquo;t the end of the world, we just want reasonable accuracy when the stats are requested and eventually high accuracy.  If it takes a few hours for this to happen, so be it.</li>
-</ul>
-
-
-<h2>Assumptions/Dependencies</h2>
-
-<h3>statsd</h3>
-
-<p>Since I&rsquo;m going to monitor the hell out of everything, I&rsquo;ll assume something statsd-compatible is available wherever this project runs.  These days I don&rsquo;t think this is really an option at all for any sort of sane environment.</p>
-
-<h2>Next Steps</h2>
-
-<p>The next few posts will likely cover the following topics:</p>
-
-<ul>
-<li>decentralized ID/hash generation</li>
-<li>Riak model for shortened links and picture data</li>
-<li>Riak model for click stats</li>
-</ul>
-
-
-<p>But those could change at any time.</p>
-
-<p>Comments/questions always welcome on <a href="http://twitter.com/j14159">Twitter</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
+    
+      <a class="prev" href="/posts/2">&larr; Older</a>
     
     <a href="/blog/archives">Blog Archives</a>
     
@@ -1286,6 +1299,10 @@ Lastly, I&rsquo;ll welcome feedback and optimization suggestions(with credit giv
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/05/27/adts-and-unification/">ADTs and Unification</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2015/03/12/recent-influences/">Recent Influences</a>
@@ -1301,10 +1318,6 @@ Lastly, I&rsquo;ll welcome feedback and optimization suggestions(with credit giv
     
       <li class="post">
         <a href="/blog/2014/12/07/becoming-better/">Becoming Better</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/07/27/akka-and-jdbc-to-services/">Akka and JDBC to Services</a>
       </li>
     
   </ul>
@@ -1374,7 +1387,7 @@ Lastly, I&rsquo;ll welcome feedback and optimization suggestions(with credit giv
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2015 - Jeremy Pierre -
+  Copyright &copy; 2016 - Jeremy Pierre -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 
