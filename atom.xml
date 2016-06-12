@@ -4,7 +4,7 @@
   <title><![CDATA[NoisyCode]]></title>
   <link href="http://noisycode.com/atom.xml" rel="self"/>
   <link href="http://noisycode.com/"/>
-  <updated>2016-05-27T19:43:29-07:00</updated>
+  <updated>2016-06-12T11:46:02-07:00</updated>
   <id>http://noisycode.com/</id>
   <author>
     <name><![CDATA[Jeremy Pierre]]></name>
@@ -12,6 +12,72 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[How I Made Broken ADTs]]></title>
+    <link href="http://noisycode.com/blog/2016/06/12/how-i-made-broken-adts/"/>
+    <updated>2016-06-12T11:08:52-07:00</updated>
+    <id>http://noisycode.com/blog/2016/06/12/how-i-made-broken-adts</id>
+    <content type="html"><![CDATA[<p>I&rsquo;ve made some progress on ADTs in my toy BEAM language and have
+discovered an issue that initially turned up with recursive types but
+would be exhibited by any type that references another user-defined
+ADT.  Spoiler:  the answer is to have a set of bindings from type
+names to their instantiated types and use these by deep-copying as
+with functions (h/t
+<a href="https://mitpress.mit.edu/books/types-and-programming-languages">Pierce&rsquo;s TAPL</a>
+for the bit about making copies).
+Briefly, the following works:</p>
+
+<pre><code>type my_list 'x = Nil | Cons ('x, my_list 'x)
+
+f x = match x with
+    Nil                         -&gt; :nil
+  | Cons (i, Nil), is_integer i -&gt; :length_one
+  | Cons (i, _)                 -&gt; :more_than_one_item
+</code></pre>
+
+<p>While this does not:</p>
+
+<pre><code>type recursive_tuples = int
+                      | float
+                      | (string, recursive_tuples)
+
+f x = match x with
+    i, is_integer i             -&gt; :int
+  | f, is_float f               -&gt; :float
+  | (key, value)                -&gt; :pair
+  | (key, (another_key, value)) -&gt; :nested_pair
+</code></pre>
+
+<p>The nested tuple <code>(another_key, value)</code> fails to unify with the type
+<code>recursive_tuples</code>.  This is because the AST node for the type definition
+gets instantiated to this record:</p>
+
+<pre><code>#adt{name="recursive_tuples"
+     vars=[],
+     members=[t_int,
+              t_float,
+              {t_tuple, [t_string,
+                         #adt{name="recursive_tuples",
+                              vars=[],
+                              members=[]}]}]}
+</code></pre>
+
+<p>The first example works because the typer maintains a proplist of type
+constructor to AST type nodes so any reference to a type constructor
+will be able to find a type to instantiate.  The second example fails
+to unify because once the typer sees the tuple, it uses the <em>tuple
+member&rsquo;s</em> enclosed members to try to type the nested tuple.  Note that
+the defined ADT specifies its members while the reference to the ADT
+later does not &ndash; there&rsquo;s nothing to unify with as it appears to be an
+empty type.</p>
+
+<p>Referring to a set of bindings for the types available to the module
+should solve this, along with deep copying for multiple instances.
+I&rsquo;m tempted to just use generalization and instantiation but it may
+ultimately be simpler to copy and make new reference cells.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[ADTs and Unification]]></title>

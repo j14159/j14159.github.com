@@ -3,6 +3,12 @@
   
   
   <url>
+    <loc>http://noisycode.com/blog/2016/06/12/how-i-made-broken-adts/</loc>
+    <lastmod>2016-06-12T11:08:52-07:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
     <loc>http://noisycode.com/blog/2016/05/27/adts-and-unification/</loc>
     <lastmod>2016-05-27T18:44:16-07:00</lastmod>
     <priority>0.8</priority>
@@ -71,21 +77,21 @@
   
   <url>
     <loc>http://noisycode.com/blog/archives/</loc>
-    <lastmod>2016-05-27T19:43:29-07:00</lastmod>
+    <lastmod>2016-06-12T11:46:02-07:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
     <loc>http://noisycode.com/</loc>
-    <lastmod>2016-05-27T19:43:29-07:00</lastmod>
+    <lastmod>2016-06-12T11:46:02-07:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   
   <url>
     <loc>http://noisycode.com/about/</loc>
-    <lastmod>2016-05-27T19:43:29-07:00</lastmod>
+    <lastmod>2016-06-12T11:46:02-07:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
