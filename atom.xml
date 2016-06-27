@@ -4,7 +4,7 @@
   <title><![CDATA[NoisyCode]]></title>
   <link href="http://noisycode.com/atom.xml" rel="self"/>
   <link href="http://noisycode.com/"/>
-  <updated>2016-06-27T16:00:01-07:00</updated>
+  <updated>2016-06-27T16:06:25-07:00</updated>
   <id>http://noisycode.com/</id>
   <author>
     <name><![CDATA[Jeremy Pierre]]></name>
@@ -48,12 +48,13 @@ even_or_odd x = match x % 2 with
 <p>It&rsquo;s written in Erlang using
 <a href="http://erlang.org/doc/man/leex.html">leex</a> and
 <a href="http://erlang.org/doc/man/yecc.html">yecc</a> for parsing and the <code>cerl</code>
-module to build a Core Erlang AST for compilation.  I had to build the
-docs for <code>cerl</code> directly as they don&rsquo;t seem to be generally hosted
-anywhere.  If you&rsquo;re curious and want to explore, you can find them
-in your Erlang distribution&rsquo;s compiler lib.  For OSX, Erlang 18.3&rsquo;s
-compiler source installed by <a href="http://brew.sh/">Homebrew</a> on my machine
-lives in the following folder:</p>
+module to build a Core Erlang AST for compilation by Erlang&rsquo;s
+<code>compile</code> module.  I had to build the docs for <code>cerl</code> directly as they
+don&rsquo;t seem to be generally hosted anywhere.  If you&rsquo;re curious and
+want to explore, you can find the source for <code>cerl</code> in your Erlang
+distribution&rsquo;s compiler lib.  For OSX, Erlang 18.3&rsquo;s compiler source
+installed by <a href="http://brew.sh/">Homebrew</a> on my machine lives in the
+following folder:</p>
 
 <pre><code>/usr/local/Cellar/erlang/18.3/lib/erlang/lib/compiler-6.0.3
 </code></pre>
