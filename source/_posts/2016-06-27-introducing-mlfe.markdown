@@ -33,12 +33,13 @@ to be desired but it works.  Here's a simple example module:
 It's written in Erlang using
 [leex](http://erlang.org/doc/man/leex.html) and
 [yecc](http://erlang.org/doc/man/yecc.html) for parsing and the `cerl`
-module to build a Core Erlang AST for compilation.  I had to build the
-docs for `cerl` directly as they don't seem to be generally hosted
-anywhere.  If you're curious and want to explore, you can find them
-in your Erlang distribution's compiler lib.  For OSX, Erlang 18.3's
-compiler source installed by [Homebrew](http://brew.sh/) on my machine
-lives in the following folder:
+module to build a Core Erlang AST for compilation by Erlang's
+`compile` module.  I had to build the docs for `cerl` directly as they
+don't seem to be generally hosted anywhere.  If you're curious and
+want to explore, you can find the source for `cerl` in your Erlang
+distribution's compiler lib.  For OSX, Erlang 18.3's compiler source
+installed by [Homebrew](http://brew.sh/) on my machine lives in the
+following folder:
 
     /usr/local/Cellar/erlang/18.3/lib/erlang/lib/compiler-6.0.3
 
