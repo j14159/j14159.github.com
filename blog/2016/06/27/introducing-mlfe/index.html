@@ -5,13 +5,13 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>How I Made Broken ADTs - NoisyCode</title>
+  <title>Introducing MLFE - NoisyCode</title>
   <meta name="author" content="Jeremy Pierre">
 
   
-  <meta name="description" content="I&rsquo;ve made some progress on ADTs in my toy BEAM language and have
-discovered an issue that initially turned up with recursive types but
-would be &hellip;">
+  <meta name="description" content="What ML-Flavoured Erlang is a statically
+typed language with basic parametric polymorphism (generics) for the
+Erlang VM that I&rsquo;ve been hacking &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -20,7 +20,7 @@ would be &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://noisycode.com/blog/2016/06/12/how-i-made-broken-adts">
+  <link rel="canonical" href="http://noisycode.com/blog/2016/06/27/introducing-mlfe">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="NoisyCode" type="application/atom+xml">
@@ -83,7 +83,7 @@ would be &hellip;">
   
   <header>
     
-      <h1 class="entry-title">How I Made Broken ADTs</h1>
+      <h1 class="entry-title">Introducing MLFE</h1>
     
     
       <p class="meta">
@@ -99,71 +99,143 @@ would be &hellip;">
   
 
 
-<time datetime="2016-06-12T11:08:52-07:00" pubdate data-updated="true">Jun 12<sup>th</sup>, 2016</time>
+<time datetime="2016-06-27T15:53:14-07:00" pubdate data-updated="true">Jun 27<sup>th</sup>, 2016</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>I&rsquo;ve made some progress on ADTs in my toy BEAM language and have
-discovered an issue that initially turned up with recursive types but
-would be exhibited by any type that references another user-defined
-ADT.  Spoiler:  the answer is to have a set of bindings from type
-names to their instantiated types and use these by deep-copying as
-with functions (h/t
-<a href="https://mitpress.mit.edu/books/types-and-programming-languages">Pierce&rsquo;s TAPL</a>
-for the bit about making copies).
-Briefly, the following works:</p>
+<div class="entry-content"><h1>What</h1>
 
-<pre><code>type my_list 'x = Nil | Cons ('x, my_list 'x)
+<p><a href="https://github.com/j14159/mlfe">ML-Flavoured Erlang</a> is a statically
+typed language with basic parametric polymorphism (generics) for the
+Erlang VM that I&rsquo;ve been hacking away at in my spare time since
+roughly the beginning of 2016.  I&rsquo;m making the repository public now
+for version 0.1.0 with the Apache 2.0 license as I think I&rsquo;ve hit the
+point of it being &ldquo;not entirely useless&rdquo;.  Currently every type is
+inferred as there are no type annotations and the error messages leave much
+to be desired but it works.  Here&rsquo;s a simple example module:</p>
 
-f x = match x with
-    Nil                         -&gt; :nil
-  | Cons (i, Nil), is_integer i -&gt; :length_one
-  | Cons (i, _)                 -&gt; :more_than_one_item
+<pre><code>module example_module
+
+/* A function that adds 2 to an integer.  If you try to call this
+   with a float you'll get a type error.
+*/
+add2 x = x + 2
+
+// a basic ADT, just no-argument type constructors:
+type even_odd Even | Odd
+
+// Convert an integer to the basic ADT:
+even_or_odd x = match x % 2 with
+    0 -&gt; Even
+  | _ -&gt; Odd
 </code></pre>
 
-<p>While this does not:</p>
+<p>It&rsquo;s written in Erlang using
+<a href="http://erlang.org/doc/man/leex.html">leex</a> and
+<a href="http://erlang.org/doc/man/yecc.html">yecc</a> for parsing and the <code>cerl</code>
+module to build a Core Erlang AST for compilation.  I had to build the
+docs for <code>cerl</code> directly as they don&rsquo;t seem to be generally hosted
+anywhere.  If you&rsquo;re curious and want to explore, you can find them
+in your Erlang distribution&rsquo;s compiler lib.  For OSX, Erlang 18.3&rsquo;s
+compiler source installed by <a href="http://brew.sh/">Homebrew</a> on my machine
+lives in the following folder:</p>
 
-<pre><code>type recursive_tuples = int
-                      | float
-                      | (string, recursive_tuples)
-
-f x = match x with
-    i, is_integer i             -&gt; :int
-  | f, is_float f               -&gt; :float
-  | (key, value)                -&gt; :pair
-  | (key, (another_key, value)) -&gt; :nested_pair
+<pre><code>/usr/local/Cellar/erlang/18.3/lib/erlang/lib/compiler-6.0.3
 </code></pre>
 
-<p>The nested tuple <code>(another_key, value)</code> fails to unify with the type
-<code>recursive_tuples</code>.  This is because the AST node for the type definition
-gets instantiated to this record:</p>
+<p>I used <a href="http://erlang.org/doc/apps/edoc/chapter.html">edoc</a> to generate API
+docs and keep them around locally for reference.</p>
 
-<pre><code>#adt{name="recursive_tuples"
-     vars=[],
-     members=[t_int,
-              t_float,
-              {t_tuple, [t_string,
-                         #adt{name="recursive_tuples",
-                              vars=[],
-                              members=[]}]}]}
-</code></pre>
+<p>The <a href="https://github.com/j14159/mlfe">MLFE repository</a> has some basic
+getting started help in the <code>README</code> but the user experience is rough around the
+edges to put it mildly.  Those of you familiar already with Erlang
+will note the distinct (temporary) absence of binaries and maps as well.</p>
 
-<p>The first example works because the typer maintains a proplist of type
-constructor to AST type nodes so any reference to a type constructor
-will be able to find a type to instantiate.  The second example fails
-to unify because once the typer sees the tuple, it uses the <em>tuple
-member&rsquo;s</em> enclosed members to try to type the nested tuple.  Note that
-the defined ADT specifies its members while the reference to the ADT
-later does not &ndash; there&rsquo;s nothing to unify with as it appears to be an
-empty type.</p>
+<h1>Why</h1>
 
-<p>Referring to a set of bindings for the types available to the module
-should solve this, along with deep copying for multiple instances.
-I&rsquo;m tempted to just use generalization and instantiation but it may
-ultimately be simpler to copy and make new reference cells.</p>
+<p>I started working on this for two reasons:  I wanted something like
+the various forms of ML ADTs to be available on the Erlang VM along with static
+typing (I like the concision and the help), and I wanted to learn more
+about how type systems are implemented.</p>
+
+<p>Much of the ADT requirement can be satisfied by atoms and tuples in
+Erlang proper but it always ends up feeling a bit cumbersome and while
+dialyzer is great, it feels like I have to work pretty hard to
+properly constrain contracts to what I really want.  None of this
+stops me for reaching for Erlang when it&rsquo;s a good fit, it&rsquo;s just a
+friction point I wanted to try to smooth out.</p>
+
+<h1>How</h1>
+
+<p>Critical to this happening at all were the following resources:</p>
+
+<ul>
+<li><a href="http://okmij.org/ftp/ML/generalization.html">&ldquo;How the OCaml type checker works&rdquo;</a>
+by Oleg Kiselyov.</li>
+<li>github.com/tomprimozic&rsquo;s <a href="https://github.com/tomprimozic/type-systems/tree/master/algorithm_w">&ldquo;Grow Your Own Type System&rdquo;</a>
+for some clarification on arrows and schema instantiation.</li>
+<li>Benjamin C. Pierce&rsquo;s
+<a href="https://mitpress.mit.edu/books/types-and-programming-languages">Types and Programming Languages</a>
+which I still need to finish and re-read properly.</li>
+<li>the source to
+<a href="https://github.com/rvirding/lfe">Lisp Flavoured Erlang</a> for clearing
+up some leex stuff and use of <code>cerl</code>.</li>
+</ul>
+
+
+<h1>What&rsquo;s Next</h1>
+
+<p>For version 0.2.0 it&rsquo;s all mostly low-hanging fruit:</p>
+
+<ul>
+<li>binaries</li>
+<li>maps</li>
+<li>quoted atoms</li>
+<li>a test form/macro</li>
+<li>do notation/side effects</li>
+</ul>
+
+
+<p>I&rsquo;d like to write a basic rebar3 plugin for it as well to simplify
+working with Erlang since so much functionality is going to depend on
+mixing with it for the time being.  Longer term the type inferencer
+needs to be substantially reworked and possibly even rewritten.
+Specific goals there:</p>
+
+<ul>
+<li>logging of typing decisions tied to reference cells and binding
+points (function and variable names)</li>
+<li>proper garbage collection of reference cells, probably abandoning
+processes for this and using something like
+<a href="http://erlang.org/doc/man/ets.html">ETS</a></li>
+<li>always generalizing type variables</li>
+</ul>
+
+
+<p>The incomplete short-list of things I&rsquo;d like to see in 1.0.0 (if I get
+that far):</p>
+
+<ul>
+<li>records with structural pattern matching.  I want to be able to
+match on a subset of fields.</li>
+<li>type annotations</li>
+<li>anonymous functions</li>
+<li>pattern matching in function definitions, e.g. <code>f (x, y) = x + y</code> to
+destructure a tuple without an explicit <code>match ... with ...</code></li>
+<li>an Emacs mode so I don&rsquo;t have to manually indent things</li>
+<li>something like <code>go fmt</code>.  My intention is to integrate comments with
+the AST partially to enable this.</li>
+</ul>
+
+
+<h1>Contributing and Discussing</h1>
+
+<p>Contributions are welcome subject to the licence and code of conduct
+as specified in the project repository.  I lurk in <code>#erlounge</code> on
+freenode as <code>j14159</code> and I&rsquo;m on Twitter with <a href="https://twitter.com/j14159">the same username</a>.</p>
 </div>
 
 
@@ -186,7 +258,7 @@ ultimately be simpler to copy and make new reference cells.</p>
   
 
 
-<time datetime="2016-06-12T11:08:52-07:00" pubdate data-updated="true">Jun 12<sup>th</sup>, 2016</time>
+<time datetime="2016-06-27T15:53:14-07:00" pubdate data-updated="true">Jun 27<sup>th</sup>, 2016</time>
       
 
 
@@ -194,7 +266,7 @@ ultimately be simpler to copy and make new reference cells.</p>
     
       <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://noisycode.com/blog/2016/06/12/how-i-made-broken-adts/" data-via="j14159" data-counturl="http://noisycode.com/blog/2016/06/12/how-i-made-broken-adts/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://noisycode.com/blog/2016/06/27/introducing-mlfe/" data-via="j14159" data-counturl="http://noisycode.com/blog/2016/06/27/introducing-mlfe/" >Tweet</a>
   
   
   
@@ -203,10 +275,8 @@ ultimately be simpler to copy and make new reference cells.</p>
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2016/05/27/adts-and-unification/" title="Previous Post: ADTs and Unification">&laquo; ADTs and Unification</a>
+        <a class="basic-alignment left" href="/blog/2016/06/12/how-i-made-broken-adts/" title="Previous Post: How I Made Broken ADTs">&laquo; How I Made Broken ADTs</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2016/06/27/introducing-mlfe/" title="Next Post: Introducing MLFE">Introducing MLFE &raquo;</a>
       
     </p>
   </footer>
@@ -326,8 +396,8 @@ ultimately be simpler to copy and make new reference cells.</p>
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://noisycode.com/blog/2016/06/12/how-i-made-broken-adts/';
-        var disqus_url = 'http://noisycode.com/blog/2016/06/12/how-i-made-broken-adts/';
+        var disqus_identifier = 'http://noisycode.com/blog/2016/06/27/introducing-mlfe/';
+        var disqus_url = 'http://noisycode.com/blog/2016/06/27/introducing-mlfe/';
         var disqus_script = 'embed.js';
       
     (function () {

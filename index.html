@@ -9,9 +9,9 @@
   <meta name="author" content="Jeremy Pierre">
 
   
-  <meta name="description" content="I&rsquo;ve made some progress on ADTs in my toy BEAM language and have
-discovered an issue that initially turned up with recursive types but
-would be &hellip;">
+  <meta name="description" content="What ML-Flavoured Erlang is a statically
+typed language with basic parametric polymorphism (generics) for the
+Erlang VM that I&rsquo;ve been hacking &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -80,6 +80,171 @@ would be &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2016/06/27/introducing-mlfe/">Introducing MLFE</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-06-27T15:53:14-07:00" pubdate data-updated="true">Jun 27<sup>th</sup>, 2016</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1>What</h1>
+
+<p><a href="https://github.com/j14159/mlfe">ML-Flavoured Erlang</a> is a statically
+typed language with basic parametric polymorphism (generics) for the
+Erlang VM that I&rsquo;ve been hacking away at in my spare time since
+roughly the beginning of 2016.  I&rsquo;m making the repository public now
+for version 0.1.0 with the Apache 2.0 license as I think I&rsquo;ve hit the
+point of it being &ldquo;not entirely useless&rdquo;.  Currently every type is
+inferred as there are no type annotations and the error messages leave much
+to be desired but it works.  Here&rsquo;s a simple example module:</p>
+
+<pre><code>module example_module
+
+/* A function that adds 2 to an integer.  If you try to call this
+   with a float you'll get a type error.
+*/
+add2 x = x + 2
+
+// a basic ADT, just no-argument type constructors:
+type even_odd Even | Odd
+
+// Convert an integer to the basic ADT:
+even_or_odd x = match x % 2 with
+    0 -&gt; Even
+  | _ -&gt; Odd
+</code></pre>
+
+<p>It&rsquo;s written in Erlang using
+<a href="http://erlang.org/doc/man/leex.html">leex</a> and
+<a href="http://erlang.org/doc/man/yecc.html">yecc</a> for parsing and the <code>cerl</code>
+module to build a Core Erlang AST for compilation.  I had to build the
+docs for <code>cerl</code> directly as they don&rsquo;t seem to be generally hosted
+anywhere.  If you&rsquo;re curious and want to explore, you can find them
+in your Erlang distribution&rsquo;s compiler lib.  For OSX, Erlang 18.3&rsquo;s
+compiler source installed by <a href="http://brew.sh/">Homebrew</a> on my machine
+lives in the following folder:</p>
+
+<pre><code>/usr/local/Cellar/erlang/18.3/lib/erlang/lib/compiler-6.0.3
+</code></pre>
+
+<p>I used <a href="http://erlang.org/doc/apps/edoc/chapter.html">edoc</a> to generate API
+docs and keep them around locally for reference.</p>
+
+<p>The <a href="https://github.com/j14159/mlfe">MLFE repository</a> has some basic
+getting started help in the <code>README</code> but the user experience is rough around the
+edges to put it mildly.  Those of you familiar already with Erlang
+will note the distinct (temporary) absence of binaries and maps as well.</p>
+
+<h1>Why</h1>
+
+<p>I started working on this for two reasons:  I wanted something like
+the various forms of ML ADTs to be available on the Erlang VM along with static
+typing (I like the concision and the help), and I wanted to learn more
+about how type systems are implemented.</p>
+
+<p>Much of the ADT requirement can be satisfied by atoms and tuples in
+Erlang proper but it always ends up feeling a bit cumbersome and while
+dialyzer is great, it feels like I have to work pretty hard to
+properly constrain contracts to what I really want.  None of this
+stops me for reaching for Erlang when it&rsquo;s a good fit, it&rsquo;s just a
+friction point I wanted to try to smooth out.</p>
+
+<h1>How</h1>
+
+<p>Critical to this happening at all were the following resources:</p>
+
+<ul>
+<li><a href="http://okmij.org/ftp/ML/generalization.html">&ldquo;How the OCaml type checker works&rdquo;</a>
+by Oleg Kiselyov.</li>
+<li>github.com/tomprimozic&rsquo;s <a href="https://github.com/tomprimozic/type-systems/tree/master/algorithm_w">&ldquo;Grow Your Own Type System&rdquo;</a>
+for some clarification on arrows and schema instantiation.</li>
+<li>Benjamin C. Pierce&rsquo;s
+<a href="https://mitpress.mit.edu/books/types-and-programming-languages">Types and Programming Languages</a>
+which I still need to finish and re-read properly.</li>
+<li>the source to
+<a href="https://github.com/rvirding/lfe">Lisp Flavoured Erlang</a> for clearing
+up some leex stuff and use of <code>cerl</code>.</li>
+</ul>
+
+
+<h1>What&rsquo;s Next</h1>
+
+<p>For version 0.2.0 it&rsquo;s all mostly low-hanging fruit:</p>
+
+<ul>
+<li>binaries</li>
+<li>maps</li>
+<li>quoted atoms</li>
+<li>a test form/macro</li>
+<li>do notation/side effects</li>
+</ul>
+
+
+<p>I&rsquo;d like to write a basic rebar3 plugin for it as well to simplify
+working with Erlang since so much functionality is going to depend on
+mixing with it for the time being.  Longer term the type inferencer
+needs to be substantially reworked and possibly even rewritten.
+Specific goals there:</p>
+
+<ul>
+<li>logging of typing decisions tied to reference cells and binding
+points (function and variable names)</li>
+<li>proper garbage collection of reference cells, probably abandoning
+processes for this and using something like
+<a href="http://erlang.org/doc/man/ets.html">ETS</a></li>
+<li>always generalizing type variables</li>
+</ul>
+
+
+<p>The incomplete short-list of things I&rsquo;d like to see in 1.0.0 (if I get
+that far):</p>
+
+<ul>
+<li>records with structural pattern matching.  I want to be able to
+match on a subset of fields.</li>
+<li>type annotations</li>
+<li>anonymous functions</li>
+<li>pattern matching in function definitions, e.g. <code>f (x, y) = x + y</code> to
+destructure a tuple without an explicit <code>match ... with ...</code></li>
+<li>an Emacs mode so I don&rsquo;t have to manually indent things</li>
+<li>something like <code>go fmt</code>.  My intention is to integrate comments with
+the AST partially to enable this.</li>
+</ul>
+
+
+<h1>Contributing and Discussing</h1>
+
+<p>Contributions are welcome subject to the licence and code of conduct
+as specified in the project repository.  I lurk in <code>#erlounge</code> on
+freenode as <code>j14159</code> and I&rsquo;m on Twitter with <a href="https://twitter.com/j14159">the same username</a>.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1226,113 +1391,6 @@ class PersonDao(cf: () =&gt; Connection) extends Actor {
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/02/02/parser-n00b/">Parser N00b</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-02-02T14:27:00-08:00" pubdate data-updated="true">Feb 2<sup>nd</sup>, 2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h1>Or: WTF, A LISP in Scala?</h1>
-
-<p><a href="https://github.com/j14159/BadLisp">Project link for the lazy</a></p>
-
-<h2>How Did It Come To This?</h2>
-
-<p>Some background first.  At my <a href="http://hootsuite.com">day job</a>, we&rsquo;ve ended up writing a lot of boilerplate for REST endpoints with Netty (it&rsquo;s relevant, I&rsquo;ll get to the LISP bit soon).  While I don&rsquo;t want to get into it too much as we&rsquo;ll likely be open-sourcing the results, we didn&rsquo;t go with bigger solutions (e.g. Jetty, Scalatra, Play) because when you do, you&rsquo;re making one or more of the following trade-offs (at minimum) in favour of an easier API for writing HTTP stuff:</p>
-
-<ul>
-<li>lack of visibility into how concurrency is handled at all levels of your application</li>
-<li>much bigger artifacts to deploy (unless you&rsquo;re a ProGuard ninja)</li>
-<li>dealing with someone else&rsquo;s assumptions about how HTTP-involved code (not necessarily a full &ldquo;web app&rdquo;) should be written</li>
-</ul>
-
-
-<p>That third point is fuel for a much longer post/many discussions well outside the scope of this one.  I&rsquo;m happy to drink beer and yell about it with you if you&rsquo;re ever in Vancouver.</p>
-
-<p>To be clear:  the above points <strong>DO NOT MATTER</strong> if you&rsquo;re writing something that&rsquo;s going on decent hardware (big servers) and/or you&rsquo;re only dealing with a few hundred concurrent connections with DB/cache/distributed communication involved (echo and static file servers are a completely different story).  Even that still depends greatly on the nature of your app and where you&rsquo;re running it.  The first point can also be mitigated by diving into the source for whatever library/framework you select but that will only get you so far, especially if you&rsquo;ve got a larger team.  We went the direction that we did because we need to deal with thousands of concurrent inbound connections per server with lots of DB and cache interactions on M1 medium through M1 large EC2 VMs. In this situation transparency and simple configurability at each layer of the application are necessities.</p>
-
-<p>Just in case:  there are other reasons we didn&rsquo;t go with Finatra but I&rsquo;ve already gone on too long.</p>
-
-<h3>Getting To The LISP Bit</h3>
-
-<p>The upshot of everything I said above is that we needed a basic routing DSL/library on top of Netty.  Since we need to provide both static and dynamic paths, it seemed natural to start looking at combinatorial parsers (if you&rsquo;re curious, go read <a href="http://www.codecommit.com/blog/scala/the-magic-behind-parser-combinators">this post</a> by <a href="https://twitter.com/djspiewak">Daniel Spiewak</a>).  After some initial fumbling with regex and possible path parsers, I decided to see what I could do with S-expressions.  This was the initial result:</p>
-
-<div><script src='https://gist.github.com/4424770.js'></script>
-<noscript><pre><code></code></pre></noscript></div>
-
-
-<p>Once I had progressed a bit further, it seemed natural to see how easily I could add simple evaluation of basic math operators (+, &ndash;, / and *).</p>
-
-<p>Short answer:  <em>easy</em></p>
-
-<p>Result:  I got sucked in and went overboard, <a href="https://github.com/j14159/BadLisp">clearly</a>.</p>
-
-<h2>A Slight Tangent</h2>
-
-<p>Before I get into what was good and bad about my first LISP implementation experience, it bears briefly demonstrating the way these experiments have resulted in a solution for the original problem:  we need a simple, transparent, configurable routing layer on top of Netty.  Our library &ldquo;Floor&rdquo; was built with a single goal in mind &ndash; ruthless minimalism while staying <a href="http://en.wikipedia.org/wiki/Don't_repeat_yourself">DRY</a>.</p>
-
-<p>Here&rsquo;s a very simple example of what Floor lets you do:</p>
-
-<div><script src='https://gist.github.com/4699916.js'></script>
-<noscript><pre><code></code></pre></noscript></div>
-
-
-<p>There&rsquo;s a bit more to it than that but I&rsquo;m sure you get the idea.</p>
-
-<h2>The Good Stuff</h2>
-
-<p>I got to dig a bit further into a couple areas that I haven&rsquo;t before and they&rsquo;re worth mentioning.  If/when Floor goes open source, you&rsquo;ll see a lot of the same stuff in it.</p>
-
-<h3>Partial Functions and Pattern Matching</h3>
-
-<p>Looking at the various traits that are bolted onto the <a href="https://github.com/j14159/BadLisp">BadLisp</a> interpreter, you&rsquo;ll see that pretty much everything is done via filtering lists of partial functions based on pattern matching.  Both special forms (like &ldquo;if-then-else&rdquo;) and the simple built-in functions (e.g. +, &ndash;, car) are implemented this way.  Check out <a href="https://github.com/j14159/BadLisp/blob/master/src/main/scala/com/noisycode/Conditionals.scala">Conditionals.scala</a> for a brief example.  I generally like this approach and for the most part find it clean but it <em>does</em> have some downsides which I&rsquo;ll touch on shortly.</p>
-
-<h3>Implicit Classes</h3>
-
-<p>New in Scala 2.10, I&rsquo;m sure they&rsquo;ll be as contentious as implicit defs and vals were before.  Regardless, I stuck one in for the <a href="https://github.com/j14159/BadLisp/blob/master/src/main/scala/com/noisycode/Comparisons.scala">Comparisons</a> trait.  I treat it a little bit like a type class in that it allows certain value-based methods to be used with classes <a href="https://github.com/j14159/BadLisp">BadLisp</a> considers to be concrete values.  I suspect based on some of the reading I&rsquo;ve done that this is not precisely what is meant by type classes in Scala but I think it&rsquo;s a step in the right direction for the moment.</p>
-
-<h2>The Bad Stuff</h2>
-
-<h3>Not Enough Implicit Classes</h3>
-
-<p>Again, probably a contentious point.  I do get the feeling, however, that I could have simplified even more with judicious use of these.  It&rsquo;s not something I&rsquo;m going to go back and refactor for but something I&rsquo;m going to keep top of mind for future stuff.  Please do weigh in via comments or <a href="http://twitter.com/j14159">Twitter</a> if you have strong feelings one way or the other about this though.</p>
-
-<h3>Partial Functions and the Symbol Table</h3>
-
-<p>Because my symbol table is simply a big list of partial functions that I match against, it&rsquo;s a bit clunky to look up or alias things in the case of higher order functions (I just wrapped this one up this morning).  I&rsquo;m not especially proud of how functions and scope <a href="https://github.com/j14159/BadLisp/blob/master/src/main/scala/com/noisycode/Definitions.scala">are handled</a> at present but I think I&rsquo;m going to leave well enough alone as I seriously doubt this is the last time I try to implement something like this.</p>
-
-<h2>Next</h2>
-
-<p>I won&rsquo;t be working on this particular interpreter further but am happy to talk about anything you find deficient and/or interesting on <a href="http://twitter.com/j14159">Twitter</a> or in the comments.  Next steps for me are getting back to <a href="https://github.com/j14159/PawnShop">PawnShop</a> and/or experimenting with some Actor and Disruptor implementations I think.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/2">&larr; Older</a>
@@ -1348,6 +1406,10 @@ class PersonDao(cf: () =&gt; Connection) extends Actor {
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2016/06/27/introducing-mlfe/">Introducing MLFE</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2016/06/12/how-i-made-broken-adts/">How I Made Broken ADTs</a>
       </li>
     
@@ -1361,10 +1423,6 @@ class PersonDao(cf: () =&gt; Connection) extends Actor {
     
       <li class="post">
         <a href="/blog/2015/02/28/cluster-reading-list/">Cluster Reading List</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/01/14/ix-and-the-throughput-slash-latency-tradeoff/">IX and the Throughput/latency Tradeoff</a>
       </li>
     
   </ul>

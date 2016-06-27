@@ -4,7 +4,7 @@
   <title><![CDATA[NoisyCode]]></title>
   <link href="http://noisycode.com/atom.xml" rel="self"/>
   <link href="http://noisycode.com/"/>
-  <updated>2016-06-12T11:46:02-07:00</updated>
+  <updated>2016-06-27T16:00:01-07:00</updated>
   <id>http://noisycode.com/</id>
   <author>
     <name><![CDATA[Jeremy Pierre]]></name>
@@ -12,6 +12,144 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Introducing MLFE]]></title>
+    <link href="http://noisycode.com/blog/2016/06/27/introducing-mlfe/"/>
+    <updated>2016-06-27T15:53:14-07:00</updated>
+    <id>http://noisycode.com/blog/2016/06/27/introducing-mlfe</id>
+    <content type="html"><![CDATA[<h1>What</h1>
+
+<p><a href="https://github.com/j14159/mlfe">ML-Flavoured Erlang</a> is a statically
+typed language with basic parametric polymorphism (generics) for the
+Erlang VM that I&rsquo;ve been hacking away at in my spare time since
+roughly the beginning of 2016.  I&rsquo;m making the repository public now
+for version 0.1.0 with the Apache 2.0 license as I think I&rsquo;ve hit the
+point of it being &ldquo;not entirely useless&rdquo;.  Currently every type is
+inferred as there are no type annotations and the error messages leave much
+to be desired but it works.  Here&rsquo;s a simple example module:</p>
+
+<pre><code>module example_module
+
+/* A function that adds 2 to an integer.  If you try to call this
+   with a float you'll get a type error.
+*/
+add2 x = x + 2
+
+// a basic ADT, just no-argument type constructors:
+type even_odd Even | Odd
+
+// Convert an integer to the basic ADT:
+even_or_odd x = match x % 2 with
+    0 -&gt; Even
+  | _ -&gt; Odd
+</code></pre>
+
+<p>It&rsquo;s written in Erlang using
+<a href="http://erlang.org/doc/man/leex.html">leex</a> and
+<a href="http://erlang.org/doc/man/yecc.html">yecc</a> for parsing and the <code>cerl</code>
+module to build a Core Erlang AST for compilation.  I had to build the
+docs for <code>cerl</code> directly as they don&rsquo;t seem to be generally hosted
+anywhere.  If you&rsquo;re curious and want to explore, you can find them
+in your Erlang distribution&rsquo;s compiler lib.  For OSX, Erlang 18.3&rsquo;s
+compiler source installed by <a href="http://brew.sh/">Homebrew</a> on my machine
+lives in the following folder:</p>
+
+<pre><code>/usr/local/Cellar/erlang/18.3/lib/erlang/lib/compiler-6.0.3
+</code></pre>
+
+<p>I used <a href="http://erlang.org/doc/apps/edoc/chapter.html">edoc</a> to generate API
+docs and keep them around locally for reference.</p>
+
+<p>The <a href="https://github.com/j14159/mlfe">MLFE repository</a> has some basic
+getting started help in the <code>README</code> but the user experience is rough around the
+edges to put it mildly.  Those of you familiar already with Erlang
+will note the distinct (temporary) absence of binaries and maps as well.</p>
+
+<h1>Why</h1>
+
+<p>I started working on this for two reasons:  I wanted something like
+the various forms of ML ADTs to be available on the Erlang VM along with static
+typing (I like the concision and the help), and I wanted to learn more
+about how type systems are implemented.</p>
+
+<p>Much of the ADT requirement can be satisfied by atoms and tuples in
+Erlang proper but it always ends up feeling a bit cumbersome and while
+dialyzer is great, it feels like I have to work pretty hard to
+properly constrain contracts to what I really want.  None of this
+stops me for reaching for Erlang when it&rsquo;s a good fit, it&rsquo;s just a
+friction point I wanted to try to smooth out.</p>
+
+<h1>How</h1>
+
+<p>Critical to this happening at all were the following resources:</p>
+
+<ul>
+<li><a href="http://okmij.org/ftp/ML/generalization.html">&ldquo;How the OCaml type checker works&rdquo;</a>
+by Oleg Kiselyov.</li>
+<li>github.com/tomprimozic&rsquo;s <a href="https://github.com/tomprimozic/type-systems/tree/master/algorithm_w">&ldquo;Grow Your Own Type System&rdquo;</a>
+for some clarification on arrows and schema instantiation.</li>
+<li>Benjamin C. Pierce&rsquo;s
+<a href="https://mitpress.mit.edu/books/types-and-programming-languages">Types and Programming Languages</a>
+which I still need to finish and re-read properly.</li>
+<li>the source to
+<a href="https://github.com/rvirding/lfe">Lisp Flavoured Erlang</a> for clearing
+up some leex stuff and use of <code>cerl</code>.</li>
+</ul>
+
+
+<h1>What&rsquo;s Next</h1>
+
+<p>For version 0.2.0 it&rsquo;s all mostly low-hanging fruit:</p>
+
+<ul>
+<li>binaries</li>
+<li>maps</li>
+<li>quoted atoms</li>
+<li>a test form/macro</li>
+<li>do notation/side effects</li>
+</ul>
+
+
+<p>I&rsquo;d like to write a basic rebar3 plugin for it as well to simplify
+working with Erlang since so much functionality is going to depend on
+mixing with it for the time being.  Longer term the type inferencer
+needs to be substantially reworked and possibly even rewritten.
+Specific goals there:</p>
+
+<ul>
+<li>logging of typing decisions tied to reference cells and binding
+points (function and variable names)</li>
+<li>proper garbage collection of reference cells, probably abandoning
+processes for this and using something like
+<a href="http://erlang.org/doc/man/ets.html">ETS</a></li>
+<li>always generalizing type variables</li>
+</ul>
+
+
+<p>The incomplete short-list of things I&rsquo;d like to see in 1.0.0 (if I get
+that far):</p>
+
+<ul>
+<li>records with structural pattern matching.  I want to be able to
+match on a subset of fields.</li>
+<li>type annotations</li>
+<li>anonymous functions</li>
+<li>pattern matching in function definitions, e.g. <code>f (x, y) = x + y</code> to
+destructure a tuple without an explicit <code>match ... with ...</code></li>
+<li>an Emacs mode so I don&rsquo;t have to manually indent things</li>
+<li>something like <code>go fmt</code>.  My intention is to integrate comments with
+the AST partially to enable this.</li>
+</ul>
+
+
+<h1>Contributing and Discussing</h1>
+
+<p>Contributions are welcome subject to the licence and code of conduct
+as specified in the project repository.  I lurk in <code>#erlounge</code> on
+freenode as <code>j14159</code> and I&rsquo;m on Twitter with <a href="https://twitter.com/j14159">the same username</a>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[How I Made Broken ADTs]]></title>
