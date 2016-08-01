@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Category: Posterity - NoisyCode</title>
+  <title>MLFE v0.2.0 Released - NoisyCode</title>
   <meta name="author" content="Jeremy Pierre">
 
   
-  <meta name="description" content="Category: posterity">
+  <meta name="description" content="ML-flavoured Erlang v0.2.0 is now ready for use. This version includes a couple of major missing pieces from the first v0.1.0 release including: &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://noisycode.com/blog/categories/posterity">
+  <link rel="canonical" href="http://noisycode.com/blog/2016/08/01/mlfe-v0-dot-2-0-released">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="NoisyCode" type="application/atom+xml">
@@ -77,36 +77,147 @@
   <div id="main">
     <div id="content">
       <div>
-<article role="article">
+<article class="hentry" role="article">
   
   <header>
-    <h1 class="entry-title">Category: Posterity</h1>
+    
+      <h1 class="entry-title">MLFE v0.2.0 Released</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-08-01T12:59:02-07:00" pubdate data-updated="true">Aug 1<sup>st</sup>, 2016</time>
+        
+      </p>
     
   </header>
-  
-  <div id="blog-archives" class="category">
 
 
+<div class="entry-content"><p><a href="https://github.com/j14159/mlfe">ML-flavoured Erlang</a> v0.2.0 is now ready for use.  This version includes a couple of major missing pieces from the first v0.1.0 release including:</p>
 
-  
-  <h2>2012</h2>
-
-<article>
-  
-<h1><a href="/blog/2012/10/23/posterity-00-ia32-memory-management/">Posterity 00: IA32 Memory Management</a></h1>
-<time datetime="2012-10-23T19:37:00-07:00" pubdate><span class='month'>Oct</span> <span class='day'>23</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/intel/'>intel</a>, <a class='category' href='/blog/categories/low-level/'>low level</a>, <a class='category' href='/blog/categories/posterity/'>posterity</a></span>
-</footer>
+<ul>
+<li>support for maps, both constructing literal maps and pattern matching</li>
+<li>binary support</li>
+<li>UTF-8 binary strings</li>
+</ul>
 
 
-</article>
+<p>This release also includes some very early support for writing unit tests inside the modules they&rsquo;re concerned with and running them via <a href="http://erlang.org/doc/apps/eunit/chapter.html">EUnit</a> and <a href="http://www.rebar3.org/">rebar3</a> with the help of <a href="https://github.com/tsloughter/rebar_prv_mlfe">Tristan Sloughter&rsquo;s plugin</a>.  If you&rsquo;re using the plugin, you&rsquo;ll be able to run tests defined in <code>.mlfe</code> files with <code>rebar3 eunit</code>.</p>
 
+<p>Here&rsquo;s the example module from the new <a href="https://github.com/j14159/mlfe/blob/master/Tour.md">tour of the language</a>:</p>
+
+<pre><code>module my_module
+
+// one function that takes a single argument will be publicly accessible:
+export double/1
+
+/* Our double function defines an "add" function inside of itself.
+   Comments for now are C-style.
+ */
+double x =
+  let add a b = a + b in
+  add x x
+
+test "doubling 2 is 4" = some_test_checker (double 2) 4
+
+// Basic ADT with type constructors:
+type even_or_odd = Even int | Odd int
+
+// A function from integers to our ADT:
+even_or_odd x =
+  let rem = x % 2 in
+  match rem with
+      0 -&gt; Even x
+    | _ -&gt; Odd x 
+</code></pre>
+
+<p>The full changelog is available <a href="https://github.com/j14159/mlfe/blob/master/ChangeLog.org">here</a> and there&rsquo;s a new <a href="https://github.com/j14159/mlfe/blob/master/Tour.md">language tour document</a> available that explains the use of the language in a little more detail for anyone new to it.</p>
+
+<h1>What&rsquo;s Next</h1>
+
+<p>For version 0.3.0 my main goals are:</p>
+
+<ul>
+<li>probable project rename</li>
+<li>type annotations/ascriptions</li>
+<li>records.  I&rsquo;d like some basic row polymorphism here (I believe this fits with records in OCaml and Elm) but need to do some more reading and research.  In all likelihood records will get syntax similar to OCaml&rsquo;s and be compiled as Erlang maps to start.</li>
+</ul>
+
+
+<p>Nice-to-haves include:</p>
+
+<ul>
+<li>quoted atoms</li>
+<li>the <code>|&gt;</code> &ldquo;pipe&rdquo; operator</li>
+<li>do notation/side effects</li>
+</ul>
+
+
+<h1>Contributing and Discussing</h1>
+
+<p>Contributions are welcome subject to the licence and code of conduct as specified in the project repository.  Please join the IRC channel <code>#mlfe</code> on <a href="http://freenode.net/">freenode</a> for help or general discussion (governed by the same code of conduct as the project).  I&rsquo;m on IRC as <code>j14159</code> and Twitter with <a href="https://twitter.com/j14159">the same username</a>.</p>
 </div>
 
+
+  <footer>
+    <p class="meta">
+      
   
+
+<span class="byline author vcard">Posted by <span class="fn">Jeremy Pierre</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-08-01T12:59:02-07:00" pubdate data-updated="true">Aug 1<sup>st</sup>, 2016</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://noisycode.com/blog/2016/08/01/mlfe-v0-dot-2-0-released/" data-via="j14159" data-counturl="http://noisycode.com/blog/2016/08/01/mlfe-v0-dot-2-0-released/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2016/06/27/introducing-mlfe/" title="Previous Post: Introducing MLFE">&laquo; Introducing MLFE</a>
+      
+      
+    </p>
+  </footer>
 </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
 
 </div>
 
@@ -215,7 +326,10 @@
       var disqus_shortname = 'noisycode';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://noisycode.com/blog/2016/08/01/mlfe-v0-dot-2-0-released/';
+        var disqus_url = 'http://noisycode.com/blog/2016/08/01/mlfe-v0-dot-2-0-released/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

@@ -9,9 +9,7 @@
   <meta name="author" content="Jeremy Pierre">
 
   
-  <meta name="description" content="What ML-Flavoured Erlang is a statically
-typed language with basic parametric polymorphism (generics) for the
-Erlang VM that I&rsquo;ve been hacking &hellip;">
+  <meta name="description" content="ML-flavoured Erlang v0.2.0 is now ready for use. This version includes a couple of major missing pieces from the first v0.1.0 release including: &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -80,6 +78,104 @@ Erlang VM that I&rsquo;ve been hacking &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2016/08/01/mlfe-v0-dot-2-0-released/">MLFE v0.2.0 Released</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-08-01T12:59:02-07:00" pubdate data-updated="true">Aug 1<sup>st</sup>, 2016</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="https://github.com/j14159/mlfe">ML-flavoured Erlang</a> v0.2.0 is now ready for use.  This version includes a couple of major missing pieces from the first v0.1.0 release including:</p>
+
+<ul>
+<li>support for maps, both constructing literal maps and pattern matching</li>
+<li>binary support</li>
+<li>UTF-8 binary strings</li>
+</ul>
+
+
+<p>This release also includes some very early support for writing unit tests inside the modules they&rsquo;re concerned with and running them via <a href="http://erlang.org/doc/apps/eunit/chapter.html">EUnit</a> and <a href="http://www.rebar3.org/">rebar3</a> with the help of <a href="https://github.com/tsloughter/rebar_prv_mlfe">Tristan Sloughter&rsquo;s plugin</a>.  If you&rsquo;re using the plugin, you&rsquo;ll be able to run tests defined in <code>.mlfe</code> files with <code>rebar3 eunit</code>.</p>
+
+<p>Here&rsquo;s the example module from the new <a href="https://github.com/j14159/mlfe/blob/master/Tour.md">tour of the language</a>:</p>
+
+<pre><code>module my_module
+
+// one function that takes a single argument will be publicly accessible:
+export double/1
+
+/* Our double function defines an "add" function inside of itself.
+   Comments for now are C-style.
+ */
+double x =
+  let add a b = a + b in
+  add x x
+
+test "doubling 2 is 4" = some_test_checker (double 2) 4
+
+// Basic ADT with type constructors:
+type even_or_odd = Even int | Odd int
+
+// A function from integers to our ADT:
+even_or_odd x =
+  let rem = x % 2 in
+  match rem with
+      0 -&gt; Even x
+    | _ -&gt; Odd x 
+</code></pre>
+
+<p>The full changelog is available <a href="https://github.com/j14159/mlfe/blob/master/ChangeLog.org">here</a> and there&rsquo;s a new <a href="https://github.com/j14159/mlfe/blob/master/Tour.md">language tour document</a> available that explains the use of the language in a little more detail for anyone new to it.</p>
+
+<h1>What&rsquo;s Next</h1>
+
+<p>For version 0.3.0 my main goals are:</p>
+
+<ul>
+<li>probable project rename</li>
+<li>type annotations/ascriptions</li>
+<li>records.  I&rsquo;d like some basic row polymorphism here (I believe this fits with records in OCaml and Elm) but need to do some more reading and research.  In all likelihood records will get syntax similar to OCaml&rsquo;s and be compiled as Erlang maps to start.</li>
+</ul>
+
+
+<p>Nice-to-haves include:</p>
+
+<ul>
+<li>quoted atoms</li>
+<li>the <code>|&gt;</code> &ldquo;pipe&rdquo; operator</li>
+<li>do notation/side effects</li>
+</ul>
+
+
+<h1>Contributing and Discussing</h1>
+
+<p>Contributions are welcome subject to the licence and code of conduct as specified in the project repository.  Please join the IRC channel <code>#mlfe</code> on <a href="http://freenode.net/">freenode</a> for help or general discussion (governed by the same code of conduct as the project).  I&rsquo;m on IRC as <code>j14159</code> and Twitter with <a href="https://twitter.com/j14159">the same username</a>.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1305,92 +1401,6 @@ class PersonDao(cf: () =&gt; Connection) extends Actor {
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/03/02/testing-erlang-spacewar/">Testing Erlang Spacewar</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-03-02T15:31:00-08:00" pubdate data-updated="true">Mar 2<sup>nd</sup>, 2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>What&rsquo;s Erlang Spacewar?</h2>
-
-<p>A multiplayer version of <a href="http://en.wikipedia.org/wiki/Spacewar!">Spacewar!</a> built in <a href="http://erlang.org">Erlang</a> with <a href="https://github.com/extend/cowboy">Cowboy</a> using websockets.  For the moment, it&rsquo;s quite basic and really intended to be a proof-of-concept.  The idea was to see if it is even <em>possible</em> to use websockets for this sort of thing.</p>
-
-<p>Right now I&rsquo;m just trying to get a sense of how it performs on a tiny little EC2 VM so I&rsquo;d be most grateful if you could grab a couple friends and jump in when you have a few minutes to spare.  Fair warning:  I fully expect it to fall over and die if there are more than 50 or so people in there but I guess we&rsquo;ll find out.</p>
-
-<p>I&rsquo;ll give you the link to play, don&rsquo;t worry, just a couple quick things&hellip;</p>
-
-<h2>How Long Will It Work For?</h2>
-
-<p>I&rsquo;m going to keep it live (aside from crashes, etc) for at least a couple of weeks I think.</p>
-
-<h2>What You Need:</h2>
-
-<p>A browser that supports websockets and HTML canvas.  Think recent versions of Chrome and Firefox, Safari <em>should</em> work.</p>
-
-<h2>Problems You Can Expect</h2>
-
-<h3>It&rsquo;s Ugly</h3>
-
-<p>And I know.  No explosions yet, very minimal.</p>
-
-<h3>It&rsquo;s Choppy Sometimes</h3>
-
-<p>It&rsquo;s running on a t1.micro in Amazon EC2&rsquo;s us-east-1 region.</p>
-
-<p><strong>Translation</strong>:  it&rsquo;s got less than a full CPU core (really just uses spare cycles from other bigger VMs) and it&rsquo;s in Virginia so if you&rsquo;re on the West coast like me, expect some lag.</p>
-
-<h3>Crashes/Termination</h3>
-
-<p>I&rsquo;ll be messing with the code for the next week so do expect unavailability due to upgrades and crashes.</p>
-
-<h2>Please Do</h2>
-
-<h3>Play it and tell me what you think</h3>
-
-<p>I know about choppiness and ugliness but if you find any other frustrating bits (or even stuff you love), please do tell me in the comments or on <a href="http://twitter.com/j14159">Twitter</a>.</p>
-
-<h3>Share the link</h3>
-
-<p>But please share the link to this blog post &ndash; I&rsquo;d like to give all test players the same warnings/notes I&rsquo;m giving you.</p>
-
-<h2>Are You Going To Release The Source?</h2>
-
-<p>Yes.  It&rsquo;ll be reasonably open (probably BSD or MIT license) on my <a href="https://github.com/j14159">github account</a> within a couple of weeks.  I&rsquo;m still cleaning things up and moving to gen_server/proper OTP instead of bare Erlang processes.</p>
-
-<p>For the record, the repository will contain the grim history of almost all my mistakes.  It&rsquo;s been a learning experience.</p>
-
-<h1>Shut Up And Let Me Play!</h1>
-
-<p>Of course.  Here&rsquo;s the game, don&rsquo;t forget to enter a username and click &ldquo;Start Playing&rdquo;:  <a href="http://esw.noisycode.com:8080/sw.html">Erlang Websocket Spacewar!</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/2">&larr; Older</a>
@@ -1406,6 +1416,10 @@ class PersonDao(cf: () =&gt; Connection) extends Actor {
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2016/08/01/mlfe-v0-dot-2-0-released/">MLFE v0.2.0 Released</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2016/06/27/introducing-mlfe/">Introducing MLFE</a>
       </li>
     
@@ -1419,10 +1433,6 @@ class PersonDao(cf: () =&gt; Connection) extends Actor {
     
       <li class="post">
         <a href="/blog/2015/03/12/recent-influences/">Recent Influences</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/02/28/cluster-reading-list/">Cluster Reading List</a>
       </li>
     
   </ul>
