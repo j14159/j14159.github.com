@@ -100,8 +100,7 @@ points (function and variable names)
   [ETS](http://erlang.org/doc/man/ets.html)
 - always generalizing type variables
 
-The incomplete short-list of things I'd like to see in 1.0.0 (if I get
-that far):
+The incomplete short-list of things I'd like to see in 1.0.0:
 
 - records with structural pattern matching.  I want to be able to
 match on a subset of fields.
