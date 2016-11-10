@@ -4,7 +4,7 @@
   <title><![CDATA[NoisyCode]]></title>
   <link href="http://noisycode.com/atom.xml" rel="self"/>
   <link href="http://noisycode.com/"/>
-  <updated>2016-08-01T14:29:56-07:00</updated>
+  <updated>2016-11-09T17:15:26-08:00</updated>
   <id>http://noisycode.com/</id>
   <author>
     <name><![CDATA[Jeremy Pierre]]></name>
@@ -12,6 +12,119 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[MLFE v0.2.4 Released]]></title>
+    <link href="http://noisycode.com/blog/2016/11/09/mlfe-v0-dot-2-4-released/"/>
+    <updated>2016-11-09T16:07:32-08:00</updated>
+    <id>http://noisycode.com/blog/2016/11/09/mlfe-v0-dot-2-4-released</id>
+    <content type="html"><![CDATA[<p><a href="https://github.com/j14159/mlfe/tree/v0.2.4">MLFE version 0.2.4</a> is now available and includes a few significant changes:</p>
+
+<ul>
+<li>fixes for type aliases and their use in union types and type constructors thanks to <a href="https://github.com/danabr">Daniel Abrahamsson</a>&rsquo;s work.</li>
+<li>early support for records with row polymorphism.</li>
+<li>some fixes for how maps are typed.</li>
+</ul>
+
+
+<h2>Type Aliases</h2>
+
+<p>Up until <a href="https://github.com/danabr">Daniel</a>&rsquo;s fixes, the following wouldn&rsquo;t type correctly:</p>
+
+<pre><code>module circles
+
+export new/1, area/1
+
+type radius = float
+
+type circle = Circle radius
+
+new r =
+  Circle r
+
+area c =
+  let pi = 3.14159 in
+  match c with
+    Circle r -&gt; pi *. (r *. r)
+</code></pre>
+
+<p>The issue was that the typer wasn&rsquo;t looking up what <code>radius</code>&rsquo;s members were when it tried to type a <code>circle</code> and further, type variables used in nested types weren&rsquo;t being handled correctly either.  Big thanks to <a href="https://github.com/danabr">Daniel</a> for his work on this.</p>
+
+<h2>Records</h2>
+
+<p>Basic records with row polymorphism are now supported in MLFE (not compatible with Erlang&rsquo;s records):</p>
+
+<pre><code>module records_with_x
+
+export make_xy/2, make_xyz/3, get_x/1, get_x_and_the_record/1
+
+make_xy x y = {x=x, y=y}
+
+make_xyz x y z = {x=x, y=y, z=z}
+
+get_x rec =
+  match rec with
+    {x=x} -&gt; x
+
+{- No matter what type of record you pass in, the record in the
+   returned tuple will always remember the full set of its fields
+   in the return type.  E.g. if you pass in {x=1, y=2, z=3}, the
+   return type won't forget about y and z, the full type returned
+   by this function will be (if you pass that exact record):
+
+   (int, {x: int, y: int, z: int})
+
+-}
+get_x_and_the_record rec =
+  match rec with
+    {x=x} -&gt; (x, rec)
+</code></pre>
+
+<p>Worth noting that the above module of course constructs polymorphic records.  You could call <code>make_xy "foo" "bar"</code> and <code>make_xy 1 2.0</code> and the two would be distinct types:</p>
+
+<pre><code>{x="foo", y="bar"}  -- {x: string, y: string}
+{x=1, y=2.0}        -- {x: int, y: float}
+</code></pre>
+
+<p>My understanding of row polymorphism so far has been driven by <a href="https://www.cs.cmu.edu/~neelk/rows.pdf">a presentation by Neel Krishnaswami</a> as well as skimming a few papers and some of <a href="http://elm-lang.org/">Elm</a>&rsquo;s history.</p>
+
+<p>Currently missing:</p>
+
+<ul>
+<li>adding fields to a record or updating/replacing them</li>
+<li>accessing individual record fields</li>
+</ul>
+
+
+<p>I&rsquo;m not currently planning on adding the removal of record fields as it seems like it could get problematic and/or confusing quickly although it poses no particular technical challenges as far as I can tell.</p>
+
+<p>To add fields to a record I&rsquo;d like the following to work:</p>
+
+<pre><code>-- This takes {x: 'a} and returns ('a, {x: 'a, hello: string})
+get_x_and_add_hello rec =
+  match rec with
+    {x=x} -&gt; (x, {rec | hello="world!"})
+</code></pre>
+
+<p>Accessing individual members should look pretty simple, e.g.</p>
+
+<pre><code>-- should type to (int, string):
+let tuple = get_x_and_add_hello {x=1} in
+  match tuple with
+    (x, rec) -&gt; (rec.x, rec.hello)
+</code></pre>
+
+<h3>For the Curious</h3>
+
+<p>MLFE&rsquo;s typer does use row variables to capture the extra fields in a record being passed around.  The row variable is constructed and added to any record the <a href="https://github.com/j14159/mlfe/blob/v0.2.4/src/mlfe_typer.erl#L1431">first time it&rsquo;s typed</a> and the function <a href="https://github.com/j14159/mlfe/blob/v0.2.4/src/mlfe_typer.erl#L762"><code>unify_records/4</code> in mlfe_typer.erl</a> is probably also of interest.</p>
+
+<p>Records are currently compiled to maps simply because it makes implementation right now far easier than as tuples.  As such we need a way to distinguish between records and maps in pattern matches so the code generation adds a key <code>'__struct__'</code> to both with the key either <code>'map'</code> or <code>'record'</code> to distinguish between the two.  Compiled pattern matches of course leverage this as well.</p>
+
+<h2>Contributing and Discussing</h2>
+
+<p>As always contributions are welcome subject to the licence and code of conduct as specified in the project&rsquo;s repository.  Please join the IRC channel <code>#mlfe</code> on <a href="http://freenode.net/">freenode</a> for help or general discussion (governed by the same code of conduct as the project).  I&rsquo;m on IRC as <code>j14159</code> and Twitter with <a href="https://twitter.com/j14159">the same username</a>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[MLFE v0.2.0 Released]]></title>

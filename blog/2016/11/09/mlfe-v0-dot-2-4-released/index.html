@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Testing Erlang Spacewar - NoisyCode</title>
+  <title>MLFE v0.2.4 Released - NoisyCode</title>
   <meta name="author" content="Jeremy Pierre">
 
   
-  <meta name="description" content="What&rsquo;s Erlang Spacewar? A multiplayer version of Spacewar! built in Erlang with Cowboy using websockets. For the moment, it&rsquo;s quite basic &hellip;">
+  <meta name="description" content="MLFE version 0.2.4 is now available and includes a few significant changes: fixes for type aliases and their use in union types and type constructors &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://noisycode.com/blog/2013/03/02/testing-erlang-spacewar">
+  <link rel="canonical" href="http://noisycode.com/blog/2016/11/09/mlfe-v0-dot-2-4-released">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="NoisyCode" type="application/atom+xml">
@@ -81,7 +81,7 @@
   
   <header>
     
-      <h1 class="entry-title">Testing Erlang Spacewar</h1>
+      <h1 class="entry-title">MLFE v0.2.4 Released</h1>
     
     
       <p class="meta">
@@ -97,64 +97,118 @@
   
 
 
-<time datetime="2013-03-02T15:31:00-08:00" pubdate data-updated="true">Mar 2<sup>nd</sup>, 2013</time>
+<time datetime="2016-11-09T16:07:32-08:00" pubdate data-updated="true">Nov 9<sup>th</sup>, 2016</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><h2>What&rsquo;s Erlang Spacewar?</h2>
+<div class="entry-content"><p><a href="https://github.com/j14159/mlfe/tree/v0.2.4">MLFE version 0.2.4</a> is now available and includes a few significant changes:</p>
 
-<p>A multiplayer version of <a href="http://en.wikipedia.org/wiki/Spacewar!">Spacewar!</a> built in <a href="http://erlang.org">Erlang</a> with <a href="https://github.com/extend/cowboy">Cowboy</a> using websockets.  For the moment, it&rsquo;s quite basic and really intended to be a proof-of-concept.  The idea was to see if it is even <em>possible</em> to use websockets for this sort of thing.</p>
+<ul>
+<li>fixes for type aliases and their use in union types and type constructors thanks to <a href="https://github.com/danabr">Daniel Abrahamsson</a>&rsquo;s work.</li>
+<li>early support for records with row polymorphism.</li>
+<li>some fixes for how maps are typed.</li>
+</ul>
 
-<p>Right now I&rsquo;m just trying to get a sense of how it performs on a tiny little EC2 VM so I&rsquo;d be most grateful if you could grab a couple friends and jump in when you have a few minutes to spare.  Fair warning:  I fully expect it to fall over and die if there are more than 50 or so people in there but I guess we&rsquo;ll find out.</p>
 
-<p>I&rsquo;ll give you the link to play, don&rsquo;t worry, just a couple quick things&hellip;</p>
+<h2>Type Aliases</h2>
 
-<h2>How Long Will It Work For?</h2>
+<p>Up until <a href="https://github.com/danabr">Daniel</a>&rsquo;s fixes, the following wouldn&rsquo;t type correctly:</p>
 
-<p>I&rsquo;m going to keep it live (aside from crashes, etc) for at least a couple of weeks I think.</p>
+<pre><code>module circles
 
-<h2>What You Need:</h2>
+export new/1, area/1
 
-<p>A browser that supports websockets and HTML canvas.  Think recent versions of Chrome and Firefox, Safari <em>should</em> work.</p>
+type radius = float
 
-<h2>Problems You Can Expect</h2>
+type circle = Circle radius
 
-<h3>It&rsquo;s Ugly</h3>
+new r =
+  Circle r
 
-<p>And I know.  No explosions yet, very minimal.</p>
+area c =
+  let pi = 3.14159 in
+  match c with
+    Circle r -&gt; pi *. (r *. r)
+</code></pre>
 
-<h3>It&rsquo;s Choppy Sometimes</h3>
+<p>The issue was that the typer wasn&rsquo;t looking up what <code>radius</code>&rsquo;s members were when it tried to type a <code>circle</code> and further, type variables used in nested types weren&rsquo;t being handled correctly either.  Big thanks to <a href="https://github.com/danabr">Daniel</a> for his work on this.</p>
 
-<p>It&rsquo;s running on a t1.micro in Amazon EC2&rsquo;s us-east-1 region.</p>
+<h2>Records</h2>
 
-<p><strong>Translation</strong>:  it&rsquo;s got less than a full CPU core (really just uses spare cycles from other bigger VMs) and it&rsquo;s in Virginia so if you&rsquo;re on the West coast like me, expect some lag.</p>
+<p>Basic records with row polymorphism are now supported in MLFE (not compatible with Erlang&rsquo;s records):</p>
 
-<h3>Crashes/Termination</h3>
+<pre><code>module records_with_x
 
-<p>I&rsquo;ll be messing with the code for the next week so do expect unavailability due to upgrades and crashes.</p>
+export make_xy/2, make_xyz/3, get_x/1, get_x_and_the_record/1
 
-<h2>Please Do</h2>
+make_xy x y = {x=x, y=y}
 
-<h3>Play it and tell me what you think</h3>
+make_xyz x y z = {x=x, y=y, z=z}
 
-<p>I know about choppiness and ugliness but if you find any other frustrating bits (or even stuff you love), please do tell me in the comments or on <a href="http://twitter.com/j14159">Twitter</a>.</p>
+get_x rec =
+  match rec with
+    {x=x} -&gt; x
 
-<h3>Share the link</h3>
+{- No matter what type of record you pass in, the record in the
+   returned tuple will always remember the full set of its fields
+   in the return type.  E.g. if you pass in {x=1, y=2, z=3}, the
+   return type won't forget about y and z, the full type returned
+   by this function will be (if you pass that exact record):
 
-<p>But please share the link to this blog post &ndash; I&rsquo;d like to give all test players the same warnings/notes I&rsquo;m giving you.</p>
+   (int, {x: int, y: int, z: int})
 
-<h2>Are You Going To Release The Source?</h2>
+-}
+get_x_and_the_record rec =
+  match rec with
+    {x=x} -&gt; (x, rec)
+</code></pre>
 
-<p>Yes.  It&rsquo;ll be reasonably open (probably BSD or MIT license) on my <a href="https://github.com/j14159">github account</a> within a couple of weeks.  I&rsquo;m still cleaning things up and moving to gen_server/proper OTP instead of bare Erlang processes.</p>
+<p>Worth noting that the above module of course constructs polymorphic records.  You could call <code>make_xy "foo" "bar"</code> and <code>make_xy 1 2.0</code> and the two would be distinct types:</p>
 
-<p>For the record, the repository will contain the grim history of almost all my mistakes.  It&rsquo;s been a learning experience.</p>
+<pre><code>{x="foo", y="bar"}  -- {x: string, y: string}
+{x=1, y=2.0}        -- {x: int, y: float}
+</code></pre>
 
-<h1>Shut Up And Let Me Play!</h1>
+<p>My understanding of row polymorphism so far has been driven by <a href="https://www.cs.cmu.edu/~neelk/rows.pdf">a presentation by Neel Krishnaswami</a> as well as skimming a few papers and some of <a href="http://elm-lang.org/">Elm</a>&rsquo;s history.</p>
 
-<p>Of course.  Here&rsquo;s the game, don&rsquo;t forget to enter a username and click &ldquo;Start Playing&rdquo;:  <a href="http://esw.noisycode.com:8080/sw.html">Erlang Websocket Spacewar!</a></p>
+<p>Currently missing:</p>
+
+<ul>
+<li>adding fields to a record or updating/replacing them</li>
+<li>accessing individual record fields</li>
+</ul>
+
+
+<p>I&rsquo;m not currently planning on adding the removal of record fields as it seems like it could get problematic and/or confusing quickly although it poses no particular technical challenges as far as I can tell.</p>
+
+<p>To add fields to a record I&rsquo;d like the following to work:</p>
+
+<pre><code>-- This takes {x: 'a} and returns ('a, {x: 'a, hello: string})
+get_x_and_add_hello rec =
+  match rec with
+    {x=x} -&gt; (x, {rec | hello="world!"})
+</code></pre>
+
+<p>Accessing individual members should look pretty simple, e.g.</p>
+
+<pre><code>-- should type to (int, string):
+let tuple = get_x_and_add_hello {x=1} in
+  match tuple with
+    (x, rec) -&gt; (rec.x, rec.hello)
+</code></pre>
+
+<h3>For the Curious</h3>
+
+<p>MLFE&rsquo;s typer does use row variables to capture the extra fields in a record being passed around.  The row variable is constructed and added to any record the <a href="https://github.com/j14159/mlfe/blob/v0.2.4/src/mlfe_typer.erl#L1431">first time it&rsquo;s typed</a> and the function <a href="https://github.com/j14159/mlfe/blob/v0.2.4/src/mlfe_typer.erl#L762"><code>unify_records/4</code> in mlfe_typer.erl</a> is probably also of interest.</p>
+
+<p>Records are currently compiled to maps simply because it makes implementation right now far easier than as tuples.  As such we need a way to distinguish between records and maps in pattern matches so the code generation adds a key <code>'__struct__'</code> to both with the key either <code>'map'</code> or <code>'record'</code> to distinguish between the two.  Compiled pattern matches of course leverage this as well.</p>
+
+<h2>Contributing and Discussing</h2>
+
+<p>As always contributions are welcome subject to the licence and code of conduct as specified in the project&rsquo;s repository.  Please join the IRC channel <code>#mlfe</code> on <a href="http://freenode.net/">freenode</a> for help or general discussion (governed by the same code of conduct as the project).  I&rsquo;m on IRC as <code>j14159</code> and Twitter with <a href="https://twitter.com/j14159">the same username</a>.</p>
 </div>
 
 
@@ -177,21 +231,15 @@
   
 
 
-<time datetime="2013-03-02T15:31:00-08:00" pubdate data-updated="true">Mar 2<sup>nd</sup>, 2013</time>
+<time datetime="2016-11-09T16:07:32-08:00" pubdate data-updated="true">Nov 9<sup>th</sup>, 2016</time>
       
-
-<span class="categories">
-  
-    <a class='category' href='/blog/categories/erlang/'>erlang</a>, <a class='category' href='/blog/categories/spacewar/'>spacewar</a>
-  
-</span>
 
 
     </p>
     
       <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://noisycode.com/blog/2013/03/02/testing-erlang-spacewar/" data-via="j14159" data-counturl="http://noisycode.com/blog/2013/03/02/testing-erlang-spacewar/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://noisycode.com/blog/2016/11/09/mlfe-v0-dot-2-4-released/" data-via="j14159" data-counturl="http://noisycode.com/blog/2016/11/09/mlfe-v0-dot-2-4-released/" >Tweet</a>
   
   
   
@@ -200,10 +248,8 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2013/02/02/parser-n00b/" title="Previous Post: Parser N00b">&laquo; Parser N00b</a>
+        <a class="basic-alignment left" href="/blog/2016/08/01/mlfe-v0-dot-2-0-released/" title="Previous Post: MLFE v0.2.0 Released">&laquo; MLFE v0.2.0 Released</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2013/03/09/espacewar-open-sourced/" title="Next Post: eSpacewar Open Sourced">eSpacewar Open Sourced &raquo;</a>
       
     </p>
   </footer>
@@ -323,8 +369,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://noisycode.com/blog/2013/03/02/testing-erlang-spacewar/';
-        var disqus_url = 'http://noisycode.com/blog/2013/03/02/testing-erlang-spacewar/';
+        var disqus_identifier = 'http://noisycode.com/blog/2016/11/09/mlfe-v0-dot-2-4-released/';
+        var disqus_url = 'http://noisycode.com/blog/2016/11/09/mlfe-v0-dot-2-4-released/';
         var disqus_script = 'embed.js';
       
     (function () {
